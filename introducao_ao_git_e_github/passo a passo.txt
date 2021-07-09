@@ -1,5 +1,4 @@
 Criando repositorio local:
-
 git init
 git add * ou git add nome_do_arquivo nome_da_pasta/
 git commit -m "mensagem"
