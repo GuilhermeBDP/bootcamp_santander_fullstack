@@ -79,5 +79,5 @@ Exemplo:
 
 ![image-20210710113504695](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710113504695.png)
 
-[^fn1]: Fonte: https://pt.slideshare.net/thiago_alima/postgresql-7885374 - Slide 25
+<sup>Fonte: https://pt.slideshare.net/thiago_alima/postgresql-7885374 - Slide 25</sup>
 
