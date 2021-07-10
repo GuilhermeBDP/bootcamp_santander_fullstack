@@ -2,11 +2,15 @@
 
 
 
-## Introdução ao Banco de Dados PostgreSQL
+## Módulo 1 - Introdução ao Banco de Dados PostgreSQL
 
 
 
-### 1) Fundamentos de bancos de dados
+### Aula 1 - Introdução
+
+
+
+#### 1) Fundamentos de banco de dados
 
 ​	<b>Dados</b>: valores brutos, registros armazenados sem qualquer tratamento ou significado. Exemplo:
 
@@ -22,7 +26,7 @@
 
 
 
-### 2) Modelos relacionais
+#### 2) Modelos Relacionais
 
 <b>Modelar:</b> modelar é criar um modelo que explicite as características de funcionamento de um elemento, de um software. No caso dos dados, a modelagem de dados demonstram como as estruturas de dados estão organizadas e como se relacionam entre si.
 
@@ -42,7 +46,7 @@ Exemplo:
 
 Mas, nem sempre a relação será 1 para 1, podendo ser do seguinte tipo:
 
-![image-20210710111827673](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710111827673.png)
+<img src="C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710111827673.png" alt="image-20210710111827673" style="zoom:50%;" />
 
 
 
@@ -69,7 +73,7 @@ Exemplo:
 
 
 
-### 3) Introdução ao PostgreSQL
+#### 3) Introdução ao PostgreSQL
 
 <b>PostgreSQL:</b> é um SGBD relacional, criado em 1986 pelo departamento de ciência da computação na universidade da Califórnia em Berkeley. É um SGBD open source.
 
@@ -77,7 +81,7 @@ Exemplo:
 
 <b>Arquitetura:</b> o PostgreSQL possui uma arquitetura multiprocessos, realizando diversas tarefas como conexão do usuário ao banco de dados.
 
-![image-20210710113504695](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710113504695.png)
+<img src="C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710113504695.png" alt="image-20210710113504695" style="zoom:60%;" />
 
 <sup>Fonte: https://pt.slideshare.net/thiago_alima/postgresql-7885374 - Slide 25</sup>
 
@@ -103,11 +107,15 @@ Site oficial: https://www.postgresql.org/
 
 
 
-## Objetos e tipos de dados do PostgreSQL
+## Módulo 2 - Objetos e tipos de dados do PostgreSQL
 
 
 
-### 1) O arquivo postgresql.conf
+### Aula 1 - Arquivos de configuração, comandos e arquitetura do PostgreSQL
+
+
+
+#### 1) O arquivo postgresql.conf
 
 Esse arquivo contém todas as configurações do servidor PostgreSQL. A view pg_settings, acessada por dentro do banco de dados, guarda todas as configurações atuais.
 
@@ -152,7 +160,7 @@ Configurações presentes no postgresql.conf:
 
 
 
-### 2) O arquivo pg_hba.conf
+#### 2) O arquivo pg_hba.conf
 
 Arquivo responsável pelo controle de autenticação dos usuários no servidor PostgreSQL. O formato do arquivo pode ser:
 
@@ -201,7 +209,151 @@ host    all             all             ::1/128                 scram-sha-256
 local   replication     all                                     scram-sha-256
 host    replication     all             127.0.0.1/32            scram-sha-256
 host    replication     all             ::1/128                 scram-sha-256
+# PARA TESTES
+host	all				all				0.0.0.0/0				md5
 ```
+
+
+
+#### 3) O arquivo pg_ident.conf
+
+Arquivo responsável por mapear os usuários do sistema operacional com os usuários do banco de dados. Localizado no diretório do postgresql.conf.
+
+
+
+```
+# MAPNAME       SYSTEM-USERNAME         PG-USERNAME
+diretoria		daniel					pg_diretoria
+comercial		guilherme				pg_comercial
+```
+
+
+
+#### 4) Comandos administrativos (Windows)
+
+Diferente do Ubuntu e do CentOS, devemos acessar o serviço do PostgreSQL, clicar com o botão direito e escolher qual opção utilizar.
+
+
+
+#### 5)  Arquitetura/Hierarquia
+
+<b>Cluster:</b> coleção de bancos de dados que compartilham as mesmas configurações (arquivos de configuração) do PostgreSQL e do sistema operacional (porta, listen_adresses, etc). 
+
+<b>Banco de Dados (Database):</b> Conjunto de schemas com seus objetos/relações (tabelas, funções, views, etc).
+
+<b>Schema:</b> Conjunto de objetos/relações (tabelas, funções, views, etc).
+
+
+
+<img src="C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710135336322.png" alt="image-20210710135336322" style="zoom:67%;" />
+
+### Aula 2 - PGAdmin4
+
+Site oficial: https://www.pgadmin.org/
+
+
+
+<b>Importante para a conexão com o banco de dados:</b>
+
+* Liberar acesso ao cluster em postgresql.conf
+* Liberar acesso ao cluster para o usuário do banco de dados em pg_hba.conf
+* Criar/editar usuários
+
+
+
+<b>Criando primeiro server, database e table:</b>
+
+* Server group:
+
+![image-20210710151620664](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710151620664.png)
+
+![image-20210710151651366](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710151651366.png)
+
+* Server:
+
+![image-20210710151733273](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710151733273.png)
+
+![image-20210710151817461](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710151817461.png)
+
+
+
+![image-20210710151839155](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710151839155.png)
+
+
+
+* Database:
+
+  * Clicar no server criado > Tools > Query Tool
+
+  ```sql
+  CREATE DATABASE auladb;
+  ```
+
+  * Clicar com o botão direito no Databases > Refresh
+
+    ![image-20210710152252245](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710152252245.png)
+
+  * Clicar na database criada > Tools > Query Tool
+
+```sql
+SELECT 1;
+```
+
+![image-20210710160005609](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710160005609.png)
+
+
+
+
+
+### Aula 3 - Usuários
+
+
+
+#### 1) Conceitos users/roles/groups
+
+Roles (papéis ou funções), users (usuáros) e grupo de usuários são "contas", perfis de atuação em um banco de dados, que possuem permissões em comum ou específicas.
+
+Nas versões anteriores do PostgreSQL 8.1, usuários e roles tinham comportamentos diferentes. Atualmente, roles e users são alias.
+
+É possível que roles pertençam a outras roles.
+
+Exemplo:
+
+![image-20210710161058376](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710161058376.png)
+
+Observe que a role daniel e a role robert pertencem a role professores, herdando suas características ou não.
+
+
+
+#### 2) Administrando users/roles/groups
+
+A criação de uma role pode ser feita da seguinte maneira:
+
+```sql
+CREATE ROLE name [[ WITH ] option [...]];
+```
+
+Onde "option" pode ser:
+
+|             OPTION              |                            Efeito                            |
+| :-----------------------------: | :----------------------------------------------------------: |
+|    SUPERUSER \| NOSUPERUSER     |             Opções irrestritas no banco de dados             |
+|     CREATEDB \| NOCREATEDB      |               Pode ou não criar banco de dados               |
+|   CREATEROLE \| NOCREATEROLE    |                   Pode ou não criar roles                    |
+|      INHERIT \| NOINHERIT       | Herda ou não herda as permissões da role em que essa role está inserida |
+|        LOGIN \| NOLOGIN         | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa |
+|  REPLICATION \| NOREPLICATION   |                                                              |
+|   CONNECTION LIMIT connlimit    |                                                              |
+| [ENCRYPTED] PASSWORD 'password' |                                                              |
+|          PASSWORD NULL          |                                                              |
+|     VALID UNTIL 'timestamp'     |                                                              |
+|     IN ROLE role_name[,...]     |                                                              |
+|    IN GROUP role_name[,...]     |                                                              |
+|      ROLE role_name[,...]       |                                                              |
+|      ADMIN role_name[,...]      |                                                              |
+|      USER role_name[,...]       |                                                              |
+
+
 
 
 
