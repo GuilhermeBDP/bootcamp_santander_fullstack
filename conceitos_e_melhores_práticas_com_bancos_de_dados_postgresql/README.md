@@ -830,3 +830,214 @@ Para resolver esse conflito de dados, devemos entrar no conceito de chave primá
 | Boolean Type      | XML Type              | Pseudo-Types            |
 | Enumerated Types  | JSON Types            | Composite Types         |
 
+
+
+#### 3) DML e DDL
+
+DML é Data Manipulation Language, ou seja, linguagem de manipulação dos dados. Dentre as funções, temos: INSERT, UPDATE, DELETE e SELECT. DDL é Data Definition Language, ou seja, linguagem de definição de dados. Dentre as funções, temos CREATE, ALTER e DROP.
+
+
+
+<b> DDL </b>
+
+```sql
+CREATE [objeto] [nome do objeto] [opcoes];
+
+ALTER [objeto] [nome do objeto] [opcoes];
+
+DROP [objeto] [nome do objeto] [opcoes];
+```
+
+```sql
+CREATE DATABASE dadosbancarios;
+ALTER DATABASE dadosbancarios OWNER TO diretoria;
+DROP DATABASE dadosbancarios;
+
+CREATE SCHEMA IF NOT EXISTS bancos;
+ALTER SCHEMA bancos OWNER TO diretoria;
+DROP SCHEMA IF EXISTS bancos;
+```
+
+```sql
+CREATE TABLE [IF NOT EXISTS] [nome da tabela](
+	[nome do campo] [tipo] [regras] [opcoes],
+	[nome do campo] [tipo] [regras] [opcoes],
+	[nome do campo] [tipo] [regras] [opcoes]
+);
+
+ALTER TABLE [nome da tabela] [opcoes];
+
+DROP TABLE [nome da tabela] [opcoes];
+```
+
+```sql
+CREATE TABLE IF NOT EXISTS banco(
+    codigo INTEGER PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL,
+    data_criacao TIMESTAMP NOT NULL DEFAULT NOW() 
+);
+
+CREATE TABLE IF NOT EXISTS banco(
+    codigo INTEGER,
+    nome VARCHAR(50) NOT NULL,
+    data_criacao TIMESTAMP NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (codigo)
+);
+
+ALTER TABLE banco
+	ADD COLUMN tem_poupanca BOOLEAN;
+	
+DROP TABLE IF EXISTS banco;
+```
+
+
+
+<b>DML</b>
+
+```sql
+INSERT INTO [nome da tabela] ([campos da tabela,])
+	VALUES ([valores de acordo com a ordem dos campos acima,]);
+	
+INSERT INTO [nome da tabela] ([campos da tabela,])
+	SELECT [valores de acordo com a ordem dos campos acima,];
+```
+
+```sql
+INSERT INTO banco (codigo, nome, data_criacao)
+	VALUES (100, 'Banco do Brasil', now());
+	
+INSERT INTO banco (codigo, nome, data_criacao)
+	SELECT 100, 'Banco do Brasil', now(); 
+```
+
+```sql
+UPDATE [nome da tabela] SET
+	[campol] = [novo valor do campol],
+	[campo2] = [novo valor do campo2],
+	[WHERE + condicoes];
+```
+
+```sql
+UPDATE banco SET
+	codigo = 500
+	WHERE codigo = 100;
+	
+UPDATE banco SET
+	data_criacao = now()
+	WHERE data_criacao IS NULL; 
+```
+
+```sql
+DELETE FROM [nome da tabela]
+	[WHERE + condicoes];
+```
+
+```sql
+DELETE FROM banco
+	WHERE codigo = 512;
+
+DELETE FROM banco
+	WHERE nome = 'Conta Digital';
+```
+
+```sql
+SELECT [campos da tabela]
+	FROM [nome da tabela]
+	[WHERE + condicoes];
+```
+
+```sql
+SELECT codigo, nome
+	FROM banco; 
+SELECT codigo, nome
+	FROM banco
+	WHERE data_criacao > '2019-10-15 15:00:00'; 
+
+```
+
+
+
+Colocando as funções aprendidas na prática:
+
+```sql
+CREATE DATABASE financas;
+```
+
+```sql
+CREATE TABLE IF NOT EXISTS banco (
+	numero INTEGER NOT NULL,
+	nome VARCHAR(50) NOT NULL,
+	ativo BOOLEAN NOT NULL DEFAULT TRUE, -- Boas praticas
+	data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Boas praticas
+	PRIMARY KEY (numero)
+);
+```
+
+```sql
+CREATE TABLE IF NOT EXISTS agencia (
+	banco_numero INTEGER NOT NULL,
+	numero INTEGER NOT NULL,
+	nome VARCHAR(80) NOT NULL,
+	ativo BOOLEAN NOT NULL DEFAULT TRUE,
+	data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (banco_numero, numero),
+	FOREIGN KEY (banco_numero) REFERENCES banco (numero)
+);
+```
+
+```sql
+CREATE TABLE cliente (
+	numero BIGSERIAL PRIMARY KEY,
+	nome VARCHAR(120) NOT NULL,
+	email VARCHAR(250) NOT NULL,
+	ativo BOOLEAN NOT NULL DEFAULT TRUE,
+	data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+```sql
+CREATE TABLE conta_corrente (
+	banco_numero INTEGER NOT NULL,
+	agencia_numero INTEGER NOT NULL,
+	numero BIGINT NOT NULL,
+	digito SMALLINT NOT NULL,
+	cliente_numero BIGINT NOT NULL,
+	ativo BOOLEAN NOT NULL DEFAULT TRUE,
+	data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (banco_numero, agencia_numero, numero, digito, cliente_numero),
+	FOREIGN KEY (banco_numero, agencia_numero) REFERENCES agencia (banco_numero, numero),
+	FOREIGN KEY (cliente_numero) REFERENCES client (numero)
+);
+```
+
+```sql
+CREATE TABLE tipo_transacao (
+	id SMALLSERIAL PRIMARY KEY,
+	nome VARCHAR(50) NOT NULL,
+	ativo BOOLEAN NOT NULL DEFAULT TRUE,
+	data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+```sql
+CREATE TABLE cliente_transacoes (
+	id BIGSERIAL PRIMARY KEY,
+	banco_numero INTEGER NOT NULL,
+	agencia_numero INTEGER NOT NULL,
+	conta_corrente_numero BIGINT NOT NULL,
+	conta_corrente_digito SMALLINT NOT NULL,
+	cliente_numero BIGINT NOT NULL,
+	tipo_transacao_id SMALLINT NOT NULL,
+	valor NUMERIC(15, 2) NOT NULL,
+	data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (banco_numero, agencia_numero, conta_corrente_numero, conta_corrente_digito, cliente_numero) REFERENCES conta_corrente (banco_numero, agencia_numero, numero, digito, cliente_numero),
+    FOREIGN KEY (tipo_transacao_id) REFERENCES tipo_transacao (id)
+);
+```
+
+
+
+Assim que as tabelas foram criadas, os dados devem ser inseridos de acordo com os arquivos destes links:
+
+https://github.com/drobcosta/digital_innovation_one/blob/master/dml.sql
+
