@@ -701,3 +701,132 @@ ERROR:  permission denied for table teste
 */
 ```
 
+
+
+
+
+### Aula 4 - Objetos e comandos do banco de dados
+
+
+
+#### 1) Database, Schemas e Objetos
+
+
+
+<b>Database:</b> Database é o banco de dados em si. Dentro dele, temos schemas e objetos. É importante frisar que Databases não compartilham os objetos dentro de cada banco. Eles apenas compartilham os usuários (roles) e as configurações globais dentro do cluster.
+
+
+
+<b>Schemas:</b> São grupos de objetos, como tabelas, views, funções, etc. Esses objetos podem ser compartilhados, interagindo entre si no banco de dados.
+
+
+
+<b>Objetos:</b> Tudo aquilo que será possível interagir e administrar dentro dos schemas. Sâo os types, sequences, tabelas, views, etc.
+
+
+
+Comandos importantes:
+
+```sql
+CREATE DATABASE name(
+	[[WITH] [OWNER [=] user_name]
+    [TEMPLATE [=] template]
+    [ENCODING [=] encoding]
+    [LC_COLLATE [=] lc_collate]
+    [LC_CTYPE [=] lc_ctype]
+    [TABLESPACE [=] tablespace_name]
+    [ALLOW_CONNECTIONS [=] allowconn]
+    [CONNECTION LIMIT [=] connlimit]
+    [IS_TEMPLATE [=] istemplate]]
+);
+
+CREATE SCHEMA schema_name [AUTHORIZATION role_specification];
+```
+
+```sql
+ALTER DATABASE name RENAME TO new_name;
+ALTER DATABASE name OWNER TO {new_owner | CURRENT_USER | SESSION_USER};
+ALTER DATABASE name SET TABLESPACE new_tablespace;
+
+ALTER SCHEMA name RENAME TO new_name ALTER SCHEMA name OWNER TO {new_owner | CURRENT_USER | SESSION_USER};
+```
+
+```sql
+DROP DATABASE [nome];
+
+DROP SCHEMA [nome];
+```
+
+
+
+Melhores práticas:
+
+```sql
+CREATE SCHEMA IF NOT EXISTS schema_name [AUTHORIZATION role_specification];
+
+DROP SCHEMA IF EXISTS [nome];
+```
+
+
+
+#### 2) Tabelas, colunas e tipos de dados
+
+Conjuntos de dados dispostos em colunas e linhas referentes a um objetivo comum. As colunas são consideradas como "campos da tabela", como atributos da tabela. As linhas de uma tabela são chamadas também de tuplas, e é onde estão contidos os valores, os dados. 
+
+Exemplo: 
+
+* TABELA = automovel
+  * COLUNA 1 = tipo (carro, moto, aviao, helicoptero)
+  * COLUNA 2 = ano_fabricacao (2010, 2011, 2020)
+  * COLUNA 3 = capacidade_pessoas (1, 2, 350)
+  * COLUNA 4 = fabricante (Honda, Avianca, Yamaha) 
+* TABELA = produto
+  * COLUNA 1 = codigo serial do produto
+  * COLUNA 2 = tipo (vestuário, eletronico, beleza)
+  * COLUNA 3 = preco 
+
+
+
+Na prática, a tabela de produto seria:
+
+| NOME   | MARCA  | TAMANHO | COR    |
+| ------ | ------ | ------- | ------ |
+| Camisa | Hering | GG      | Branca |
+| Calça  | Levis  | 46      | Preta  |
+
+
+
+Mas, pode ocorrer a inserção de dados iguais na tabela, como mostrado abaixo:
+
+| NOME   | MARCA  | TAMANHO | COR    |
+| ------ | ------ | ------- | ------ |
+| Camisa | Hering | GG      | Branca |
+| Calça  | Levis  | 46      | Preta  |
+| Camisa | Hering | GG      | Branca |
+
+
+
+Para resolver esse conflito de dados, devemos entrar no conceito de chave primária.
+
+<b>Primary Key / Chave Primária / PK:</b> Olhando o conceito do modelo de dados relacional e as regras de normalização de banco de dados. uma PK é um conjunto de um ou mais campos que nunca se repetem na tabela e os valores contidos nesses campos garantem a integridade de dado único e a utilização do mesmo como referência para o relacionamento com as demais tabelas.
+
+
+
+<b>Foreign Key / Chave Estrangeira / FK:</b>  A FK é um campo ou conjunto de campo que são referências das chaves primárias de outras tabelas
+
+ ou da mesma tabela. A principal função é garantir a integridade referencial entre as tabelas.
+
+
+
+<b>Tipos de dados:</b> O PostgreSQL possui diversos tipos de dados, como mostrado a seguir.
+
+| Tipos de dados    | -                     | -                       |
+| ----------------- | --------------------- | ----------------------- |
+| Numeric Types     | Geometric Types       | Arrays                  |
+| Monetary Types    | Network Address Types | Range Types             |
+| Character Types   | Bit String Types      | Domain Types            |
+| Binary Data Types | Text Search Types     | Object Identifier Types |
+| Date/Time Types   | UUID Type             | pg_Isn Type             |
+| Boolean Type      | XML Type              | Pseudo-Types            |
+| Enumerated Types  | JSON Types            | Composite Types         |
+
