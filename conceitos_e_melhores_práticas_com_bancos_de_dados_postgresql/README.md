@@ -319,7 +319,7 @@ Nas versões anteriores do PostgreSQL 8.1, usuários e roles tinham comportament
 
 Exemplo:
 
-![image-20210710161058376](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710161058376.png)
+<img src="C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710161058376.png" alt="image-20210710161058376" style="zoom:67%;" />
 
 Observe que a role daniel e a role robert pertencem a role professores, herdando suas características ou não.
 
@@ -335,25 +335,369 @@ CREATE ROLE name [[ WITH ] option [...]];
 
 Onde "option" pode ser:
 
-|             OPTION              |                            Efeito                            |
-| :-----------------------------: | :----------------------------------------------------------: |
-|    SUPERUSER \| NOSUPERUSER     |             Opções irrestritas no banco de dados             |
-|     CREATEDB \| NOCREATEDB      |               Pode ou não criar banco de dados               |
-|   CREATEROLE \| NOCREATEROLE    |                   Pode ou não criar roles                    |
-|      INHERIT \| NOINHERIT       | Herda ou não herda as permissões da role em que essa role está inserida |
-|        LOGIN \| NOLOGIN         | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa |
-|  REPLICATION \| NOREPLICATION   |                                                              |
-|   CONNECTION LIMIT connlimit    |                                                              |
-| [ENCRYPTED] PASSWORD 'password' |                                                              |
-|          PASSWORD NULL          |                                                              |
-|     VALID UNTIL 'timestamp'     |                                                              |
-|     IN ROLE role_name[,...]     |                                                              |
-|    IN GROUP role_name[,...]     |                                                              |
-|      ROLE role_name[,...]       |                                                              |
-|      ADMIN role_name[,...]      |                                                              |
-|      USER role_name[,...]       |                                                              |
+|                      OPTION                      |                            Efeito                            |
+| :----------------------------------------------: | :----------------------------------------------------------: |
+|             SUPERUSER \| NOSUPERUSER             |             Opções irrestritas no banco de dados             |
+|              CREATEDB \| NOCREATEDB              |               Pode ou não criar banco de dados               |
+|            CREATEROLE \| NOCREATEROLE            |                   Pode ou não criar roles                    |
+|               INHERIT \| NOINHERIT               | Herda ou não herda as permissões da role<br />em que essa role está inserida |
+|                 LOGIN \| NOLOGIN                 |          Pode ou não se conectar no banco de dados           |
+|           REPLICATION \| NOREPLICATION           |                 Pode ou não realizar backups                 |
+|             BYPASSRLS \| NOBYPASSRLS             | Role Level Security<br />Referente a segurança em nivel de role |
+|            CONNECTION LIMIT connlimit            | Define quantas conexões simultâneas<br />a role pode ter no banco de dados |
+| [ENCRYPTED] PASSWORD 'password' \| PASSWORD NULL | Define se o password pode ou não<br />ser encriptografado. Utilizado em operações<br />de backup, restore em terminais. |
+|             VALID UNTIL 'timestamp'              | Define até qual data a role possui<br />acesso ao banco de dados |
+|             IN ROLE role_name[,...]              | Ao criar uma role e adicionar o IN ROLE,<br />a nova role vai pertencer a role definida pela option |
+|             IN GROUP role_name[,...]             |    Função deprecada (descontinuada)<br />alias do IN ROLE    |
+|               ROLE role_name[,...]               | Ao criar uma role e adicionar o ROLE,<br />a role definida pela option vai pertencer a nova role |
+|              ADMIN role_name[,...]               | As roles definidas dentro dessa option passarão a fazer<br />parte da nova role e terão acessos administrativos nesse novo<br />grupo |
+|               USER role_name[,...]               |             Função descontinuada, alias do ROLE              |
+|                    SYSID uid                     |                     Função descontinuada                     |
 
 
 
+Exemplos de códigos:
 
+```sql
+CREATE ROLE administradores
+	CREATEDB
+	CREATEROLE
+	INHERIT
+	NOLOGIN
+	REPLICATION
+	BYPASSRLS
+	CONNECTION LIMIT -1;
+	
+CREATE ROLE professsores
+	NOCREATEDB
+	NOCREATEROLE
+	INHERIT
+	NOLOGIN
+	NOBYPASSRLS
+	CONNECTION LIMIT 10;
+	
+CREATE ROLE alunos
+	NOCREATEDB
+	NOCREATEROLE
+	INHERIT
+	NOLOGIN
+	NOBYPASSRLS
+	CONNECTION LIMIT 90;
+```
+
+
+
+Associação entre roles: Quando uma role assume as permissões de outra role, será necessária a opção INHERIT. No momento da criação da role, deve-se usar o IN ROLE ou ROLE para realizar a associação ou utilizar o GRANT, concedendo uma role para outra role.
+
+Exemplo:
+
+```sql
+CREATE ROLE professsores
+	NOCREATEDB
+	NOCREATEROLE
+	INHERIT
+	NOLOGIN
+	NOBYPASSRLS
+	CONNECTION LIMIT -1;
+
+CREATE ROLE daniel
+	LOGIN
+	CONNECTION LIMIT 1
+	PASSWORD '123'
+	IN ROLE professores;
+
+CREATE ROLE daniel
+	LOGIN
+	CONNECTION LIMIT 1
+	PASSWORD '123'
+	ROLE professores;
+	
+CREATE ROLE daniel
+	LOGIN
+	CONNECTION LIMIT 1
+	PASSWORD '123';
+GRANT professores TO daniel;
+```
+
+
+
+Desassociação entre roles: Utilizando o comando REVOKE [...] FROM [...]. 
+
+Exemplo:
+
+```sql
+REVOKE professores FROM daniel;
+```
+
+
+
+Alterando uma role: Basta utilizar o comando ALTER ROLE.
+
+Exemplo:
+
+```sql
+ALTER ROLE role_name [WITH] option [...]
+```
+
+Onde option pode ser:
+
+|                      OPTION                      |                            Efeito                            |
+| :----------------------------------------------: | :----------------------------------------------------------: |
+|             SUPERUSER \| NOSUPERUSER             |             Opções irrestritas no banco de dados             |
+|              CREATEDB \| NOCREATEDB              |               Pode ou não criar banco de dados               |
+|            CREATEROLE \| NOCREATEROLE            |                   Pode ou não criar roles                    |
+|               INHERIT \| NOINHERIT               | Herda ou não herda as permissões da role<br />em que essa role está inserida |
+|                 LOGIN \| NOLOGIN                 |          Pode ou não se conectar no banco de dados           |
+|           REPLICATION \| NOREPLICATION           |                 Pode ou não realizar backups                 |
+|             BYPASSRLS \| NOBYPASSRLS             | Role Level Security<br />Referente a segurança em nivel de role |
+|            CONNECTION LIMIT connlimit            | Define quantas conexões simultâneas<br />a role pode ter no banco de dados |
+| [ENCRYPTED] PASSWORD 'password' \| PASSWORD NULL | Define se o password pode ou não<br />ser encriptografado. Utilizado em operações<br />de backup, restore em terminais. |
+|             VALID UNTIL 'timestamp'              | Define até qual data a role possui<br />acesso ao banco de dados |
+|             IN ROLE role_name[,...]              | Ao criar uma role e adicionar o IN ROLE,<br />a nova role vai pertencer a role definida pela option |
+|               ROLE role_name[,...]               | Ao criar uma role e adicionar o ROLE,<br />a role definida pela option vai pertencer a nova role |
+|              ADMIN role_name[,...]               | As roles definidas dentro dessa option passarão a fazer<br />parte da nova role e terão acessos administrativos nesse novo<br />grupo |
+
+
+
+Excluindo uma role:
+
+Exemplo:
+
+```sql
+DROP ROLE daniel;
+```
+
+
+
+Utilizando no PGAdmin4 e o terminal:
+
+```sql
+CREATE ROLE professsores
+	NOCREATEDB
+	NOCREATEROLE
+	INHERIT
+	NOLOGIN
+	NOBYPASSRLS
+	CONNECTION LIMIT 10;
+
+/* TERMINAL
+postgres-# \du
+
+                                    List of roles
+  Role name  |                         Attributes                         | Member of
+-------------+------------------------------------------------------------+-----------
+ postgres    | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
+ professores | Cannot login                                              +| {}
+             | 10 connections                                             |
+*/
+```
+
+```SQL
+ALTER ROLE professores
+	PASSWORD '123';
+
+/* TERMINAL
+postgres-# \c auladb professores
+Password for user professores:
+FATAL:  role "professores" is not permitted to log in
+Previous connection kept
+
+postgres-# \du
+                                    List of roles
+  Role name  |                         Attributes                         | Member of
+-------------+------------------------------------------------------------+-----------
+ postgres    | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
+ professores | Cannot login                                              +| {}
+             | 10 connections                                             |
+*/
+```
+
+```sql
+CREATE ROLE daniel
+	LOGIN
+	PASSWORD '123';
+
+/* TERMINAL
+                                    List of roles
+  Role name  |                         Attributes                         | Member of
+-------------+------------------------------------------------------------+-----------
+ daniel      |                                                            | {}
+ postgres    | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
+ professores | Cannot login                                              +| {}
+             | 10 connections                                             |
+*/
+```
+
+```SQL
+DROP ROLE daniel;
+CREATE ROLE daniel
+	LOGIN
+	PASSWORD '123'
+	IN ROLE professores;
+
+/* TERMINAL
+                                      List of roles
+  Role name  |                         Attributes                         |   Member of
+-------------+------------------------------------------------------------+---------------
+ daniel      |                                                            | {professores}
+ postgres    | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
+ professores | Cannot login                                              +| {}
+             | 10 connections                                             |
+*/
+```
+
+```SQL
+DROP ROLE daniel;
+CREATE ROLE daniel
+	LOGIN
+	PASSWORD '123'
+	ROLE professores;
+
+/* TERMINAL
+                                    List of roles
+  Role name  |                         Attributes                         | Member of
+-------------+------------------------------------------------------------+-----------
+ daniel      |                                                            | {}
+ postgres    | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
+ professores | Cannot login                                              +| {daniel}
+             | 10 connections                                             |
+*/
+```
+
+
+
+#### 3) Administrando acessos (GRANT e REVOKE)
+
+São privilégios de acesso aos objetos do banco de dados. Privilégios:
+
+* Tabela
+* Coluna
+* Sequence
+* Database
+* Domain
+* Foreign data wrapper
+* Foreign server
+* Function
+* Language
+* Large object
+* Schema
+* Tablespace
+* Type
+
+
+
+Database:
+
+```sql
+GRANT {{ CREATE | CONNECT | TEMPORARY | TEMP}[,...] | ALL [PRIVILEGES]}
+	ON DATABASE database_name[,...]
+	TO role_name[,...] [WITH GRANT OPTION]
+
+REVOKE [GRANT OPTION FOR]
+	{{ CREATE | CONNECT | TEMPORARY | TEMP}[,...] | ALL [PRIVILEGES]}
+	ON DATABASE database_name[,...]
+	FROM {[GROUP] role_name | PUBLIC}[,...]
+	[CASCADE | RESTRICT]
+```
+
+Schema:
+
+```sql
+GRANT {{ CREATE | USAGE}[,...] | ALL [PRIVILEGES]}
+	ON SCHEMA schema_name[,...]
+	TO role_name[,...] [WITH GRANT OPTION]
+	
+REVOKE [GRANT OPTION FOR]
+	{{CREATE | USAGE}[,...] | ALL [PRIVILEGES]}
+	ON SCHEMA schema_name[,...]
+	FROM {[GROUP] role_name | PUBLIC}[,...]
+	[CASCADE | RESTRICT]
+```
+
+Table:
+
+```SQL
+GRANT {{SELECT | INSERT | UPDATE | DELETE | TRUNCATE | REFERENCES | TRIGGER}[,...] | ALL [PRIVILEGES]}
+	ON {[TABLE] table_name[,...] | ALL TABLES IN SCHEMA schema_name [,...]}
+	TO role_name[,...] [WITH GRANT OPTION]
+
+REVOKE [GRANT OPTION FOR]
+	{{SELECT | INSERT | UPDATE | DELETE | TRUNCATE | REFERENCES | TRIGGER}[,...] | ALL [PRIVILEGES]}
+	ON {[TABLE] table_name[,...] | ALL TABLES IN SCHEMA schema_name [,...]}
+	FROM {[GROUP] role_name | PUBLIC}[,...]
+	[CASCADE | RESTRICT]
+```
+
+Revogando todas as permissões:
+
+```sql
+REVOKE ALL ON ALL TABLES IN SCHEMA [schema] FROM [role];
+REVOKE ALL ON SCHEMA [schema] FROM [role];
+REVOKE ALL ON DATABASE [database] FROM [role];
+```
+
+
+
+Exemplo:
+
+```sql
+CREATE TABLE teste(
+	nome VARCHAR
+);
+GRANT ALL ON TABLE teste TO professores;
+```
+
+```sql
+DROP ROLE daniel;
+CREATE ROLE daniel
+	LOGIN
+	PASSWORD '123';
+
+/* TERMINAL
+postgres-# \c auladb daniel
+Password for user daniel:
+You are now connected to database "auladb" as user "daniel".
+
+auladb=> SELECT nome FROM teste;
+ERROR:  permission denied for table teste
+*/
+```
+
+```sql
+REASSIGN OWNED BY professores TO postgres;  -- or some other trusted role
+DROP OWNED BY professores;
+DROP ROLE professores;
+CREATE ROLE professores
+	NOCREATEDB
+	NOCREATEROLE
+	INHERIT
+	NOLOGIN
+	NOBYPASSRLS
+	CONNECTION LIMIT 10;
+	
+GRANT ALL ON TABLE teste TO professores;
+
+DROP ROLE daniel;
+CREATE ROLE daniel
+	INHERIT
+	LOGIN
+	PASSWORD '123'
+	IN ROLE professores;
+
+/* TERMINAL
+auladb=> SELECT nome FROM teste;
+ nome
+------
+(0 rows)
+*/
+```
+
+```sql
+REVOKE professores FROM daniel;
+
+/* TERMINAL
+auladb=> SELECT nome FROM teste;
+ERROR:  permission denied for table teste
+*/
+```
 
