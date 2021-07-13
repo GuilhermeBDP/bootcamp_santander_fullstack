@@ -45,18 +45,33 @@ Sistema distribuído seguro: devido a facilidade de compartilhar o código, alte
 Criando um repositório local e remoto:
 
 * Criando repositorio local:
-  * git init
-  * git add * ou git add nome_do_arquivo nome_da_pasta/
-  * git commit -m "mensagem"
-  * git status
+
+  ```git
+  git init
+  git add <b>.</b> ou git add nome_do_arquivo nome_da_pasta/
+  git commit -m "mensagem"
+  git status
+  ```
 
 
 
 * Sincronizando com repositorio remoto
-  * git remote add origin link_do_repositorio
-  * git branch -M main
-  * git push -u origin main
+
+  ```git
+  git remote add origin link_do_repositorio
+  git branch -M main
+  git push -u origin main
+  ```
+
+  
 
 ![Interface gráfica do usuário  Descrição gerada automaticamente](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\clip_image012.jpg)
 
  
+
+* Clonando projeto na pasta local: Na pasta de preferência, copia o projeto todo para a pasta designada.
+
+```git
+git clone link_do_projeto
+```
+

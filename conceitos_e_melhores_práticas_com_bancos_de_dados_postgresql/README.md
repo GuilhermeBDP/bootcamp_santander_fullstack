@@ -1041,3 +1041,194 @@ Assim que as tabelas foram criadas, os dados devem ser inseridos de acordo com o
 
 https://github.com/drobcosta/digital_innovation_one/blob/master/dml.sql
 
+
+
+
+
+## Fundamentos da Structured Query Language (SQL)
+
+
+
+### Aula 1 - DML (Data Manipulation Language)
+
+
+
+#### 1) Revisão
+
+* PK: conjunto de um ou mais campos que formam a identidade da tabela
+* FK: referência para chaves primárias de outra tabela ou da mesma tabela
+* Tipos de dados: Serial, bigint, varchar, etc
+* DDL: Data Definition Language
+* DML: Data Manipulation Language
+
+
+
+<b>Idempotência:</b> É a propriedade que algumas ações ou operações possuem que possibilitam elas de serem executadas diversas vezes sem alterar o resultado após a aplicação inicial. Alguns comandos são:
+
+* IF EXISTS
+* Comandos pertinentes ao DDL e DML
+
+Exemplo:
+
+```sql
+CREATE TABLE cliente (
+	numero BIGSERIAL PRIMARY KEY,
+	nome VARCHAR(120) NOT NULL,
+	email VARCHAR(250) NOT NULL,
+	ativo BOOLEAN NOT NULL DEFAULT TRUE,
+	data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+Agora, com a propriedade de idempotência:
+
+```sql
+CREATE TABLE IF NOT EXISTS cliente (
+	numero BIGSERIAL PRIMARY KEY,
+	nome VARCHAR(120) NOT NULL,
+	email VARCHAR(250) NOT NULL,
+	ativo BOOLEAN NOT NULL DEFAULT TRUE,
+	data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+
+
+<b>Melhores práticas em DDL</b>
+
+É importante que as tabelas possuam campos que realmente serão utilizados e que sirvam de atributo direto a um objetivo em comum. Algumas outras práticas são:
+
+* Tomar cuidado com regras (constraints)
+* Tomar cuidado com excesso de FKs
+* Tomar cuidado com o tamanho indevido de atributos. Ex: coluna CEP VARCHAR(255), sendo que o CEP tem apenas 8 dígitos.
+
+
+
+#### 2) DML / CRUD (Create Read Update Delete)
+
+```sql
+SELECT [campos da tabela]
+	FROM [nome da tabela]
+	[WHERE + condicoes];
+```
+
+```sql
+SELECT codigo, nome
+	FROM banco; 
+SELECT codigo, nome
+	FROM banco
+	WHERE data_criacao > '2019-10-15 15:00:00';
+SELECT numero, nome FROM banco
+	WHERE ativo IS TRUE;
+
+SELECT nome
+	FROM cliente
+	WHERE email LIKE '%gmail.com';
+	
+SELECT numero
+	FROM agencia
+	WHERE banco_numero IN(
+        SELECT numero
+        	FROM banco
+            WHERE nome ILIKE '%Bradesco%'
+);
+```
+
+
+
+Condições do SELECT: WHERE, AND e OR
+
+* WHERE (coluna/condição):
+  * =
+  * \> / \>= 
+  * \< / \<=
+  * <> / !=
+  * LIKE
+  * ILIKE
+  * IN
+
+
+
+<b>SELECT - Idempotência</b>
+
+Essa forma não é recomendável, pois gasta muitos recursos da database.
+
+```sql
+SELECT (campos,)
+	FROM tabelal
+	WHERE EXISTS (
+        SELECT (campo,)
+        	FROM tabela2
+        	WHERE campol = valorl
+        		[AND/OR campoN = valorN]
+  	); 
+
+```
+
+
+
+<b>INSERT</b>
+
+```SQL
+INSERT (campos,)
+	VALUES (valores,);
+	
+INSERT (campos,)
+	SELECT (valores,);
+```
+
+Exemplos
+
+```sql
+INSERT INTO agenda (banco_numero, numero, nome)
+	VALUES (341,1,'Centro da cidade');
+	
+INSERT INTO agenda (banco_numero, numero, nome)
+	SELECT 341,1,'Centro da cidade'
+	WHERE NOT EXISTS (
+        SELECT banco_numero, numero, nome
+        FROM agencia
+        	WHERE banco_numero = 341 AND numero = 1 AND nome = 'Centro da cidade'); -- Não é boa prática
+```
+
+
+
+<b>ON CONFLICT</b>
+
+```sql
+INSERT INTO agenda (banco_numero, numero, nome)
+	VALUES (341,1,'Centro da cidade')
+	ON CONFLICT (banco_numero, numero) DO NOTHING; 
+```
+
+
+
+<b>UPDATE</b>
+
+```SQL
+UPDATE (tabela) SET campo1 = novo_valor
+	WHERE (condicao);
+```
+
+
+
+<b>DELETE</b>
+
+```sql
+DELETE FROM tabela SET campo1 = novo_valor
+	WHERE condicao;
+```
+
+
+
+#### 3) TRUNCATE
+
+Esse comando esvazia a tabela. 
+
+```sql
+TRUNCATE [TABLE] [ONLY] name [*] [,...]
+	[RESTART IDENTITY | CONTINUE IDENTITY] [CASCADE | RESTRICT]
+```
+
+* RESTART IDENTITY: numero serial (id) é reiniciado
+* CONTINUE IDENTITY: o numero serial é continuado de onde a tabela anterior parou (padrão)
