@@ -75,3 +75,10 @@ Criando um repositório local e remoto:
 git clone link_do_projeto
 ```
 
+
+
+* Em casos de conflito ao dar pull de um projeto:
+
+Em projetos em equipe, se existe qualquer alteração na sua area de trabalho (branch) que você fez desde a ultima atualização e vc não commitar essas alterações,  o github nao entende que você finalizou as alterações que desejava.
+
+Ao commitar, ele consegue conferir se haverá algum conflito com o pull que vc está solicitando. Imagine que vc nao commite alteração no mesmo arquivo que você fez pull e foi alterado por outra pessoa, o que daria um conflito, porém se você não commitou essa alteração, o git nao veria esse conflito e ficaria uma bagunça. Logo, ele nao permite nem pull nem push sem que todos as alterações tenham sido ou descartadas ou commitadas
