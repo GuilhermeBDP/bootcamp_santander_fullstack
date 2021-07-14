@@ -1,3 +1,5 @@
+
+
 # Conceitos e melhores práticas com banco de dados PostgreSQL
 
 
@@ -1232,3 +1234,93 @@ TRUNCATE [TABLE] [ONLY] name [*] [,...]
 
 * RESTART IDENTITY: numero serial (id) é reiniciado
 * CONTINUE IDENTITY: o numero serial é continuado de onde a tabela anterior parou (padrão)
+
+
+
+<b>Prática</b>
+
+```sql
+SELECT numero, nome FROM banco;
+```
+
+![image-20210712231042427](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231042427.png)
+
+```sql
+SELECT numero, nome, ativo FROM banco;
+```
+
+![image-20210712231121992](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231121992.png)
+
+```sql
+SELECT banco_numero, numero, nome FROM agencia;
+```
+
+![image-20210712231606983](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231606983.png)
+
+```sql
+SELECT numero, nome, email FROM cliente;
+```
+
+![image-20210712231625594](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231625594.png)
+
+```sql
+SELECT id, nome FROM tipo_transacao;
+```
+
+![image-20210712231641321](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231641321.png)
+
+```sql
+SELECT banco_numero, agencia_numero, numero, cliente_numero FROM conta_corrente;
+```
+
+![image-20210712231702860](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231702860.png)
+
+```sql
+SELECT banco_numero, agencia_numero, cliente_numero FROM cliente_transacoes;
+```
+
+![image-20210712231717324](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231717324.png)
+
+```sql
+SELECT * FROM conta_corrente;
+```
+
+![image-20210712231824608](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231824608.png)
+
+```sql
+SELECT * FROM information_schema.columns WHERE table_name = 'banco'
+```
+
+![image-20210712231843002](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231843002.png)
+
+```sql
+CREATE TABLE IF NOT EXISTS teste(
+	id serial PRIMARY KEY,
+	nome VARCHAR(50) NOT NULL,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TABLE IF EXISTS teste;
+
+CREATE TABLE IF NOT EXISTS teste(
+	cpf VARCHAR(11) NOT NULL,
+	nome VARCHAR(50) NOT NULL,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (cpf)
+);
+
+INSERT INTO teste (cpf, nome)
+VALUES ('25222555225', 'José Colmeia') ON CONFLICT (cpf) DO NOTHING;
+```
+
+![image-20210712232000852](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712232000852.png)
+
+```sql
+UPDATE teste SET nome = 'Pedro Alvares' WHERE cpf = '25222555225';
+SELECT * FROM teste;
+```
+
+![image-20210712232014469](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712232014469.png)
+
+
+
