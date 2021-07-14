@@ -1443,3 +1443,42 @@ SELECT MAX(valor), MIN(valor), tipo_transacao_id
 
 ![image-20210714120801629](https://i.loli.net/2021/07/14/PuQgpRCjNFMTk41.png)
 
+```sql
+SELECT COUNT(id), tipo_transacao_id
+	FROM cliente_transacoes
+	GROUP BY tipo_transacao_id;
+```
+
+![image-20210714123007400](https://i.loli.net/2021/07/14/8eks3goiMVG2U4z.png)
+
+```sql
+SELECT COUNT(id), tipo_transacao_id
+	FROM cliente_transacoes
+	GROUP BY tipo_transacao_id
+	HAVING COUNT(id) < 150;
+```
+
+![image-20210714123112378](https://i.loli.net/2021/07/14/WcoT5UrOZvm2ztu.png)
+
+```sql
+SELECT SUM(valor)
+	FROM cliente_transacoes;
+```
+
+![image-20210714123202016](https://i.loli.net/2021/07/14/r75QYmIoZjpxLTX.png)
+
+```sql
+SELECT SUM(valor), tipo_transacao_id
+	FROM cliente_transacoes
+	GROUP BY tipo_transacao_id;
+```
+
+![image-20210714123257314](https://i.loli.net/2021/07/14/yM5GezYNiEqInQ9.png)
+
+```sql
+SELECT SUM(valor), tipo_transacao_id
+	FROM cliente_transacoes
+	GROUP BY tipo_transacao_id;
+```
+
+![image-20210714123417134](https://i.loli.net/2021/07/14/jRBH912fbxLnkdY.png)
