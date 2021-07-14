@@ -1047,7 +1047,7 @@ https://github.com/drobcosta/digital_innovation_one/blob/master/dml.sql
 
 
 
-## Fundamentos da Structured Query Language (SQL)
+## Módulo 3 - Fundamentos da Structured Query Language (SQL)
 
 
 
@@ -1323,4 +1323,123 @@ SELECT * FROM teste;
 ![image-20210712232014469](https://i.loli.net/2021/07/14/FD2KNI3z1G4dwrE.png)
 
 
+
+
+
+### Aula 2 - Funções Agregadas
+
+
+
+#### 1) Funções agregadas
+
+Documentação: https://www.postgresql.org/docs/13/functions-aggregate.html
+
+Funções agregadas mais comumente usadas:
+
+* AVG
+* COUNT (opção: HAVING)
+* MAX
+* MIN
+* SUM
+
+
+
+Para selecionar os dados que você quer de uma tabela, basta oferecer os nomes das colunas e da tabela de origem:
+
+```sql
+SELECT numero, nome FROM banco;
+SELECT banco_numero, numero, nome FROM agencia;
+SELECT numero, nome, email FROM cliente;
+SELECT banco_numero, agencia_numero, cliente_numero FROM cliente_transacoes;
+```
+
+
+
+Mas, caso você não lembre os nomes das colunas, é possível utilizar o ```SELECT * FROM tabela```, o que não é recomendado pois gasta muitos recursos do banco de dados. Assim, é possível utilizar essa função auxiliar para adquirir os nomes das colunas de uma tabela:
+
+```sql
+SELECT * FROM information_schema.columns WHERE table_name = 'banco';
+```
+
+![image-20210714111930613](https://i.loli.net/2021/07/14/ESdnuhTLbvPjR9m.png)
+
+
+
+Ou então:
+
+```sql
+SELECT column_name, data_type
+	FROM information_schema.columns
+	WHERE table_name = 'banco';
+```
+
+![image-20210714112205843](https://i.loli.net/2021/07/14/AdNeFHVbuEnTg6s.png)
+
+
+
+```sql
+SELECT AVG (valor) FROM cliente_transacoes;
+```
+
+![image-20210714112426169](https://i.loli.net/2021/07/14/xEpJAIKG4gPzZqf.png)
+
+```sql
+SELECT COUNT(numero)
+	FROM cliente;
+```
+
+![image-20210714112559150](https://i.loli.net/2021/07/14/GpT8vaEjNiuSLwn.png)
+
+```sql
+SELECT COUNT(numero), email
+	FROM cliente
+	WHERE email ILIKE '%gmail.com';
+```
+
+![image-20210714112702130](https://i.loli.net/2021/07/14/l5i2zSHTcv9RBaY.png)
+
+
+
+O erro acima é devido ao fato de que as funções agregadas são funções de agrupamento, então no momento que o código é executado, todos os valores são agrupados em uma coluna e linha, apenas, assim como o email. Então, para contornar esse problema, utiliza-se a função GROUP BY:
+
+```sql
+SELECT COUNT(numero), email
+	FROM cliente
+	WHERE email ILIKE '%gmail.com'
+	GROUP BY email;
+```
+
+![image-20210714115806959](https://i.loli.net/2021/07/14/kuTfjhpaHnzVvAg.png)
+
+Observe que o que foi contado foi quantos valores da coluna "numero" existiam pra cada email que terminasse com "gmail". Para contar quantos emails existem com o final gmail, usa-se a primeira função do COUNT apresentada, ou seja:
+
+```sql
+SELECT COUNT(email)
+	FROM cliente
+	WHERE email ILIKE '%gmail.com';
+```
+
+![image-20210714115949737](https://i.loli.net/2021/07/14/SJzhE5DC4mBFTMn.png)
+
+```sql
+SELECT MAX(numero), MIN(numero)
+	FROM cliente;
+```
+
+![image-20210714120424871](https://i.loli.net/2021/07/14/aSIWEwbeKsohcZV.png)
+
+```sql
+SELECT MAX(valor), MIN(valor)
+	FROM cliente_transacoes;
+```
+
+![image-20210714120544958](https://i.loli.net/2021/07/14/MAEwLHqKfZ78I2C.png)
+
+```sql
+SELECT MAX(valor), MIN(valor), tipo_transacao_id
+	FROM cliente_transacoes
+	GROUP BY tipo_transacao_id;
+```
+
+![image-20210714120801629](https://i.loli.net/2021/07/14/PuQgpRCjNFMTk41.png)
 
