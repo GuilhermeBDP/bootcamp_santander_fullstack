@@ -48,7 +48,7 @@ Exemplo:
 
 Mas, nem sempre a relação será 1 para 1, podendo ser do seguinte tipo:
 
-<img src="C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710111827673.png" alt="image-20210710111827673" style="zoom:50%;" />
+<img src="https://i.loli.net/2021/07/14/dmqT3NwKr4aLuMW.png" alt="image-20210710111827673" style="zoom:50%;" />
 
 
 
@@ -67,7 +67,7 @@ Mas, nem sempre a relação será 1 para 1, podendo ser do seguinte tipo:
 
 Exemplo:
 
-![image-20210710112650746](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710112650746.png)
+![image-20210710112650746](https://i.loli.net/2021/07/14/XDnlCpu27KUyQZL.png)
 
 
 
@@ -83,7 +83,7 @@ Exemplo:
 
 <b>Arquitetura:</b> o PostgreSQL possui uma arquitetura multiprocessos, realizando diversas tarefas como conexão do usuário ao banco de dados.
 
-<img src="C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710113504695.png" alt="image-20210710113504695" style="zoom:60%;" />
+<img src="https://i.loli.net/2021/07/14/NWDwAc5fEZLCv7y.png" alt="image-20210710113504695" style="zoom:60%;" />
 
 <sup>Fonte: https://pt.slideshare.net/thiago_alima/postgresql-7885374 - Slide 25</sup>
 
@@ -247,7 +247,7 @@ Diferente do Ubuntu e do CentOS, devemos acessar o serviço do PostgreSQL, clica
 
 
 
-<img src="C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710135336322.png" alt="image-20210710135336322" style="zoom:67%;" />
+<img src="https://i.loli.net/2021/07/14/IEmDt2UxVzNyRnc.png" alt="image-20210710135336322" style="zoom:67%;" />
 
 ### Aula 2 - PGAdmin4
 
@@ -267,19 +267,19 @@ Site oficial: https://www.pgadmin.org/
 
 * Server group:
 
-![image-20210710151620664](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710151620664.png)
+![image-20210710151620664](https://i.loli.net/2021/07/14/5NC8qujmBGLn9cp.png)
 
-![image-20210710151651366](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710151651366.png)
+![image-20210710151651366](https://i.loli.net/2021/07/14/1ISn2oEw9GjlArp.png)
 
 * Server:
 
-![image-20210710151733273](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710151733273.png)
+![image-20210710151733273](https://i.loli.net/2021/07/14/AOkWlGVK1qzfcet.png)
 
-![image-20210710151817461](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710151817461.png)
+![image-20210710151817461](https://i.loli.net/2021/07/14/rsloxVuhv7Ra2p8.png)
 
 
 
-![image-20210710151839155](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710151839155.png)
+![image-20210710151839155](https://i.loli.net/2021/07/14/tD38FVCIqR6SThX.png)
 
 
 
@@ -293,7 +293,7 @@ Site oficial: https://www.pgadmin.org/
 
   * Clicar com o botão direito no Databases > Refresh
 
-    ![image-20210710152252245](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710152252245.png)
+    ![image-20210710152252245](https://i.loli.net/2021/07/14/J4el6KYjTqUGSDd.png)
 
   * Clicar na database criada > Tools > Query Tool
 
@@ -301,7 +301,7 @@ Site oficial: https://www.pgadmin.org/
 SELECT 1;
 ```
 
-![image-20210710160005609](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710160005609.png)
+![image-20210710160005609](https://i.loli.net/2021/07/14/4xguQnwsMkoKJtz.png)
 
 
 
@@ -321,7 +321,7 @@ Nas versões anteriores do PostgreSQL 8.1, usuários e roles tinham comportament
 
 Exemplo:
 
-<img src="C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210710161058376.png" alt="image-20210710161058376" style="zoom:67%;" />
+<img src="https://i.loli.net/2021/07/14/8CEhbAj3LgcHUet.png" alt="image-20210710161058376" style="zoom:67%;" />
 
 Observe que a role daniel e a role robert pertencem a role professores, herdando suas características ou não.
 
@@ -1243,55 +1243,55 @@ TRUNCATE [TABLE] [ONLY] name [*] [,...]
 SELECT numero, nome FROM banco;
 ```
 
-![image-20210712231042427](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231042427.png)
+![image-20210712231042427](https://i.loli.net/2021/07/14/MwdGIt6zuErX57e.png)
 
 ```sql
 SELECT numero, nome, ativo FROM banco;
 ```
 
-![image-20210712231121992](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231121992.png)
+![image-20210712231121992](https://i.loli.net/2021/07/14/94gOKPjCGUbzSeJ.png)
 
 ```sql
 SELECT banco_numero, numero, nome FROM agencia;
 ```
 
-![image-20210712231606983](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231606983.png)
+![image-20210712231606983](https://i.loli.net/2021/07/14/kEFmX6ZaGRihWql.png)
 
 ```sql
 SELECT numero, nome, email FROM cliente;
 ```
 
-![image-20210712231625594](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231625594.png)
+![image-20210712231625594](https://i.loli.net/2021/07/14/1IOmhDozAepGLMP.png)
 
 ```sql
 SELECT id, nome FROM tipo_transacao;
 ```
 
-![image-20210712231641321](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231641321.png)
+![image-20210712231641321](https://i.loli.net/2021/07/14/vLAtCpGogQ1STVd.png)
 
 ```sql
 SELECT banco_numero, agencia_numero, numero, cliente_numero FROM conta_corrente;
 ```
 
-![image-20210712231702860](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231702860.png)
+![image-20210712231702860](https://i.loli.net/2021/07/14/pfqVZCMEy7XdShl.png)
 
 ```sql
 SELECT banco_numero, agencia_numero, cliente_numero FROM cliente_transacoes;
 ```
 
-![image-20210712231717324](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231717324.png)
+![image-20210712231717324](https://i.loli.net/2021/07/14/SCpjH2NfFxUq8OL.png)
 
 ```sql
 SELECT * FROM conta_corrente;
 ```
 
-![image-20210712231824608](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231824608.png)
+![image-20210712231824608](https://i.loli.net/2021/07/14/e4nXOoZGxb7sJam.png)
 
 ```sql
 SELECT * FROM information_schema.columns WHERE table_name = 'banco'
 ```
 
-![image-20210712231843002](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712231843002.png)
+![image-20210712231843002](https://i.loli.net/2021/07/14/s5CUeYTdXx8mJSj.png)
 
 ```sql
 CREATE TABLE IF NOT EXISTS teste(
@@ -1313,14 +1313,14 @@ INSERT INTO teste (cpf, nome)
 VALUES ('25222555225', 'José Colmeia') ON CONFLICT (cpf) DO NOTHING;
 ```
 
-![image-20210712232000852](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712232000852.png)
+![image-20210712232000852](https://i.loli.net/2021/07/14/9vEMwUGbgy3rHV2.png)
 
 ```sql
 UPDATE teste SET nome = 'Pedro Alvares' WHERE cpf = '25222555225';
 SELECT * FROM teste;
 ```
 
-![image-20210712232014469](C:\Users\guilh\Google Drive\Cursos Online\Bootcamp Santander Fullstack DIO\conceitos_e_melhores_práticas_com_bancos_de_dados_postgresql\images\image-20210712232014469.png)
+![image-20210712232014469](https://i.loli.net/2021/07/14/FD2KNI3z1G4dwrE.png)
 
 
 
