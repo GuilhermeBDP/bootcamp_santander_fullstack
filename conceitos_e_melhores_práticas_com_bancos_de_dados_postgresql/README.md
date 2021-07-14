@@ -1482,3 +1482,231 @@ SELECT SUM(valor), tipo_transacao_id
 ```
 
 ![image-20210714123417134](https://i.loli.net/2021/07/14/jRBH912fbxLnkdY.png)
+
+
+
+### Aula 3 - Relacionamento entre tabelas (JOINS)
+
+
+
+#### 1) JOINS
+
+Tipos de JOINs que podemos utilizar:
+
+* JOIN
+* LEFT JOIN
+* RIGHT JOIN
+* FULL JOIN
+* CROSS JOIN
+
+
+
+<b>JOIN (INNER JOIN)</b>
+
+​	Imagine que você tenha duas tabelas e vai realizar o JOIN entre elas, ao realizar o JOIN deve-se sempre utilizar campos das tabelas que referenciem umas as outras. Assim, o resultado da query é somente os dados que pertençam a essa relação. É uma boa prática utilizar PKs, FKs ou índices das tabelas para as referências do JOIN pois assim o processo é mais rápido.
+
+<img src="https://i.loli.net/2021/07/14/ZHaVwLUfFWNEA17.png" alt="image-20210714125240409" style="zoom:80%;" />
+
+Sintaxe básica:
+
+```sql
+SELECT tabela_1.campos, tabela_2.campos
+	FROM tabela_1
+	JOIN tabela_2
+		ON tabela_2.campo = tabela1.campo;
+```
+
+
+
+Considerando as seguintes tabelas:
+
+![image-20210714125600255](https://i.loli.net/2021/07/14/Uzfiy3X6RKHBFOl.png)
+
+
+
+ Utilizando o JOIN:
+
+![image-20210714125619849](https://i.loli.net/2021/07/14/kFCYz2a8OJRpqiD.png)
+
+
+
+<b>LEFT JOIN (LEFT OUTER JOIN)</b>
+
+​	Ao relacionar tabelas, temos as tabelas a esquerda e tabelas a direita. Ao realizar um LEFT JOIN, você quer dizer que as tabelas que estão a esquerda vão ser trazidas por completo e as tabelas da direita irão ser trazidas apenas nos locais que houverem relação com a tabela da esquerda.
+
+<img src="https://i.loli.net/2021/07/15/Q5nRMBm2Z1LVpzt.png" alt="image-20210714131150924" style="zoom:80%;" />
+
+Sintaxe básica:
+
+```sql
+SELECT tabela_1.campos, tabela_2.campos
+	FROM tabela_1
+	LEFT JOIN tabela_2
+		ON tabela_2.campo = tabela1.campo;
+```
+
+
+
+Considerando as tabelas do exemplo anterior e aplicando agora o LEFT JOIN, temos:
+
+![image-20210714131442356](https://i.loli.net/2021/07/15/O5bM86hXkfxCWiF.png)
+
+
+
+<b>RIGHT JOIN (RIGHT OUTER JOIN)</b>
+
+De maneira análoga ao LEFT JOIN, mas a prioridade é da tabela da direita.
+
+
+
+Sintaxe básica:
+
+```sql
+SELECT tabela_1.campos, tabela_2.campos
+	FROM tabela_1
+	RIGHT JOIN tabela_2
+		ON tabela_2.campo = tabela1.campo;
+```
+
+
+
+Considere o novo exemplo abaixo:
+
+![image-20210714131933551](https://i.loli.net/2021/07/15/2a3Wo6fLJuIHSUZ.png)
+
+Através da seguinte tabela de relações, temos:
+
+![image-20210714132050510](https://i.loli.net/2021/07/15/8buxFqvITSJGpKf.png)
+
+Utilizando o RIGHT JOIN, temos:
+
+![image-20210714132111866](https://i.loli.net/2021/07/15/ipYELJAk5N4aV2n.png)
+
+
+
+<b>FULL JOIN (FULL OUTER JOIN)</b>
+
+O FULL JOIN irá trazer todas as relações possíveis.
+
+<img src="https://i.loli.net/2021/07/15/tHWDfxyRLBkjqhd.png" alt="image-20210714132247802" style="zoom:80%;" />
+
+Não é recomendável utilizar o FULL JOIN em operação pois gastam muitos recursos. É mais utilizado quando deseja-se fazer relatórios.
+
+
+
+Sintaxe básica:
+
+```sql
+SELECT tabela_1.campos, tabela_2.campos
+	FROM tabela_1
+	FULL JOIN tabela_2
+		ON tabela_2.campo = tabela1.campo;
+```
+
+
+
+Do exemplo anterior, temos:
+
+![image-20210714132450025](https://i.loli.net/2021/07/15/UP27kbEVrChJ86a.png)
+
+
+
+<b>CROSS JOIN</b>
+
+Recomendado apenas para situações extremas. Todos os dados de uma tabela serão cruzados com todos os dados da tabela referenciada, criando uma matriz. Utilizar essa função em produção pode consumir demais os recursos, afetando a dinâmica de produção.
+
+
+
+Sintaxe básica:
+
+```sql
+SELECT tabela_1.campos, tabela_2.campos
+	FROM tabela_1
+	CROSS JOIN tabela_2;
+```
+
+
+
+Utilizando as seguintes tabelas como exemplo e aplicando o CROSS JOIN, temos:
+
+<img src="https://i.loli.net/2021/07/15/VwDWYPb2HArzJKt.png" alt="image-20210714132832069" style="zoom:80%;" />
+
+<img src="https://i.loli.net/2021/07/15/acqroi6gsH45G92.png" alt="image-20210714132854065" style="zoom:80%;" />
+
+
+
+Prática:
+
+```sql
+SELECT COUNT(1)
+	FROM banco; --153
+	
+SELECT COUNT(1)
+	FROM agencia; --296
+```
+
+```sql
+-- Selecionando os bancos e suas respectivas agencias com base no número do banco
+
+SELECT banco.numero, banco.nome, agencia.numero, agencia.nome
+	FROM banco
+	JOIN agencia
+		ON agencia.banco_numero = banco.numero;
+		
+SELECT COUNT(banco.numero)
+	FROM banco
+	JOIN agencia
+		ON agencia.banco_numero = banco.numero; -- 296 agencias
+```
+
+
+
+Observe que o SELECT COUNT(banco.numero) não retornou o número de bancos, mas sim o número de registros em que o agencia.banco_numero era igual a banco.numero. Para contar o número de bancos, usa-se o DISTINCT.
+
+```sql
+SELECT banco.numero
+	FROM banco
+	JOIN agencia
+		ON agencia.banco_numero = banco.numero
+	GROUP BY banco.numero;
+```
+
+![image-20210714135201567](https://i.loli.net/2021/07/15/1KnN4kA5pxCeLIJ.png)
+
+Utilizando o DISTINCT:
+
+```sql
+SELECT COUNT(DISTINCT banco.numero)
+	FROM banco
+	JOIN agencia
+		ON agencia.banco_numero = banco.numero -- Resultado: 9
+```
+
+
+
+```sql
+SELECT banco.numero, banco.nome, agencia.numero, agencia.nome
+    FROM banco
+    LEFT JOIN agencia
+        ON agencia.banco_numero = banco.numero; -- 440 registros
+
+SELECT banco.numero, banco.nome, agencia.numero, agencia.nome
+    FROM agencia
+    RIGHT JOIN banco
+        ON banco.numero = agencia.banco_numero; -- 440 registros
+```
+
+```sql
+	SELECT banco.numero, banco.nome, agencia.numero, agencia.nome
+FROM agencia
+LEFT JOIN banco
+	ON banco.numero = agencia.banco_numero; -- 296 registros
+```
+
+```sql
+SELECT banco.numero, banco.nome, agencia.numero, agencia.nome
+    FROM banco
+    FULL JOIN agencia
+        ON agencia.banco_numero = banco.numero; -- 440 registros
+```
+
