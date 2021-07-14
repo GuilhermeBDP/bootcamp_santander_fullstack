@@ -1682,8 +1682,6 @@ SELECT COUNT(DISTINCT banco.numero)
 		ON agencia.banco_numero = banco.numero -- Resultado: 9
 ```
 
-
-
 ```sql
 SELECT banco.numero, banco.nome, agencia.numero, agencia.nome
     FROM banco
@@ -1709,4 +1707,89 @@ SELECT banco.numero, banco.nome, agencia.numero, agencia.nome
     FULL JOIN agencia
         ON agencia.banco_numero = banco.numero; -- 440 registros
 ```
+
+
+
+Realizando o CROSS JOIN com duas tabelas:
+
+```sql
+CREATE TABLE IF NOT EXISTS teste_a(
+	id serial PRIMARY KEY,
+	valor VARCHAR(10)
+);
+
+CREATE TABLE IF NOT EXISTS teste_b(
+	id serial PRIMARY KEY,
+	valor VARCHAR(10)
+);
+
+INSERT INTO teste_a (valor) VALUES ('teste1');
+INSERT INTO teste_a (valor) VALUES ('teste2');
+INSERT INTO teste_a (valor) VALUES ('teste3');
+INSERT INTO teste_a (valor) VALUES ('teste4');
+
+INSERT INTO teste_b (valor) VALUES ('testeA');
+INSERT INTO teste_b (valor) VALUES ('testeB');
+INSERT INTO teste_b (valor) VALUES ('testeC');
+INSERT INTO teste_b (valor) VALUES ('testeD');
+
+SELECT tbla.valor, tblb.valor
+FROM teste_a tbla
+CROSS JOIN teste_b tblb;
+
+DROP TABLE IF EXISTS teste_a;
+DROP TABLE IF EXISTS teste_b;
+```
+
+![image-20210714141030798](https://i.loli.net/2021/07/15/gs3AhN8miK5qIrw.png)
+
+
+
+```sql
+SELECT	banco.nome,
+		agencia.nome,
+		conta_corrente.numero,
+		conta_corrente.digito,
+		cliente.nome
+FROM banco
+JOIN agencia ON agencia.banco_numero = banco.numero
+JOIN conta_corrente
+		-- ON conta_corrente.banco_numero = agencia.banco_numero
+		ON conta_corrente.banco_numero = banco.numero
+		AND conta_corrente.agencia_numero = agencia.numero
+JOIN cliente
+		ON cliente.numero = conta_corrente.cliente_numero;
+```
+
+![image-20210714141824865](https://i.loli.net/2021/07/15/ZwikxOLdbaEtYuP.png)
+
+
+
+Teste: A partir do SELECT acima, incluir as transacoes de cada cliente e os tipos de transacoes de cada cliente.
+
+```SQL
+SELECT	banco.nome,
+		agencia.nome,
+		conta_corrente.numero,
+		conta_corrente.digito,
+		cliente.nome,
+		cliente_transacoes.valor,
+		tipo_transacao.nome
+	FROM banco
+	JOIN agencia
+		ON agencia.banco_numero = banco.numero
+	JOIN conta_corrente
+		-- ON conta_corrente.banco_numero = agencia.banco_numero
+		ON conta_corrente.banco_numero = banco.numero
+		AND conta_corrente.agencia_numero = agencia.numero
+	JOIN cliente
+		ON cliente.numero = conta_corrente.cliente_numero
+	JOIN cliente_transacoes
+		ON cliente_transacoes.cliente_numero = cliente.numero
+	JOIN tipo_transacao
+		ON tipo_transacao.id = cliente_transacoes.tipo_transacao_id
+	ORDER BY cliente_transacoes.valor DESC;
+```
+
+![image-20210714143505363](https://i.loli.net/2021/07/15/IpNCgxLoicuyv5D.png)
 
