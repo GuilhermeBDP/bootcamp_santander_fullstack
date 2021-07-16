@@ -2570,3 +2570,361 @@ SELECT id, gerente, nome
 
 ![image-20210716160447753](https://i.loli.net/2021/07/17/SRLYBePbIymC9QW.png)
 
+
+
+### Aula 3 - Funções
+
+
+
+#### 1) Funções
+
+Função é um conjunto de códigos que são executados dentro de uma transação com a finalidade de facilitar a programação e obter o reaproveitamento/reutilização de códigos. Não são todas as funções que possuem o recurso de trabalhar com transações. Funções que possuem recursos de transação são mais seguras e práticas.
+
+Existem quatro tipos de funções:
+
+* Query Language Functions (funções escritas em SQL)
+* Procedural Language Functions (funções escritas em, por exemplo, PL/pgSQL ou PL/py)
+* Internal functions
+* C-language functions
+
+Porém, o foco é falar sobre USER DEFINED FUNCTIONS, ou seja, funções que podem ser criadas pelo usuário.
+
+
+
+<b>Linguagens</b>
+
+As funções que os usuários podem criar são funções SQL ou funções de linguagens procedurais:
+
+* SQL
+* PL/PGSQL
+* PL/PY
+* PL/PHP
+* PL/RUBY
+* PL/Java
+* PL/Lua
+* ...
+
+Documentação: https://www.postgresgl.org/docs/11/external-pl.html 
+
+Sintaxe básica e argumentos:
+
+```sql
+CREATE [ OR REPLACE ] FUNCTION
+	name ( [ [ argmode ] [ argname ] argtype [ { DEFAULT | = } default_expr ] [, ...] ] )
+	[ RETURNS rettype
+     	| RETURNS TABLE ( column_name column_type [, ...] ) ]
+    { LANGUAGE lang_name
+    | TRANSFORM { FOR TYPE type_name } [, ...]
+    | WINDOW
+    | IMMUTABLE | STABLE | VOLATILE | [ NOT ] LEAKPROOF
+    | CALLED ON NULL INPUT | RETURNS NULL ON NULL INPUT | STRICT
+    | [ EXTERNAL ] SECURITY INVOKER | [ EXTERNAL ] SECURITY DEFINER
+    | PARALLEL { UNSAFE | RESTRICTED | SAFE }
+    | COST execution_cost
+    | ROWS result_rows
+    | SET configuration_parameter { TO value | = value | FROM CURRENT } 
+    | AS 'definition'
+    | AS 'obj_file', 'link_symbol'
+} ...
+```
+
+
+
+<b>Idempotência</b>
+
+A idempotência, como dito anteriormente, previne erros na aplicação, fornece segurança ao banco de dados e traz melhor prática de programação, evitando dores de cabeça.
+
+Na função, deve-se usar o OR REPLACE, com as seguintes regras para trabalhar com idempotência:
+
+* A função deve ter o mesmo nome
+* A função deve ter o mesmo tipo de retorno
+* A função deve ter o mesmo número de parâmetros / argumentos
+
+
+
+<b>Returns</b>
+
+* Tipo de retorno (data type)
+  * INTEGER
+  * CHAR/VARCHAR
+  * BOOLEAN
+  * ROW
+  * TABLE
+  * JSON
+
+
+
+<b>Language</b>
+
+* SQL
+* PLPGSQL
+* PLJAVA
+* PLPY
+* ...
+
+
+
+<b>Security</b>
+
+* INVOKER: permite que a função seja executada com as permissões do usuário que está executando a função
+* DEFINER: faz com que o usuário que está executando a função com as permissões do usuário que criou a função.
+
+
+
+<b>Comportamento</b>
+
+* IMMUTABLE: Não permite códigos de alteração do campo de dados. Permitem apenas comandos que possam retornar o mesmo valor quando você utiliza os mesmos argumentos. Evitar a utilização de selects pois as tabelas são mutáveis.
+* STABLE: Não permite códigos de alteração do campo de dados. Permitem apenas comandos que possam retornar o mesmo valor quando você utiliza os mesmos argumentos. Permite o uso de selects e de outros comandos com tipo current_timestamp e outros tipos.
+* VOLATILLE: Comportamento padrão. Aceita todos os cenários.
+
+
+
+<b>Segurança e boas práticas</b>
+
+* CALLED ON NULL INPUT: Padrão. Se qualquer parâmetro ou argumento vier nulo, a função é executada da mesma forma.
+* RETURNS NULL ON NULL INPUT: Se qualquer um dos argumentos for nulo, a função não é executada, retornando nulo.
+* SECURITY INVOKER: Função executada com as permissões de quem a executou.
+* SECURITY DEFINER: Função executada com as permissões de quem a criou.
+
+
+
+<b>Recursos</b>
+
+* COST: é o custo por ROW em unidades de CPU. O custo é em unidades de GPU.
+* ROW: número estimado de linhas que será analisada pelo planner.
+
+
+
+<b>SQL Functions</b>
+
+Não é possível utilizar transações.
+
+Exemplo:
+
+```sql
+CREATE OR REPLACE FUNCTION fc_somar(INTEGER, INTEGER)
+    RETURNS INTEGER
+    LANGUAGE SQL
+    AS $$ 
+        SELECT $1 + $2; -- $1 representa o primeiro parâmetro, $2 o segundo
+    $$; 
+
+CREATE OR REPLACE FUNCTION fc_somar(numl INTEGER, num2 INTEGER)
+    RETURNS INTEGER
+    LANGUAGE SQL
+    AS $$ 
+        SELECT numl + num2;
+    $$; 
+```
+
+```sql
+CREATE OR REPLACE FUNCTION fc_bancos add(p numero INTEGER, p nome VARCHAR,p ativo BOOLEAN)
+    RETURNS TABLE (numero INTEGER, nome VARCHAR)
+    RETURNS NULL ON NULL INPUT
+    LANGUAGE SQL
+    AS $$ 
+        INSERT INTO banco (numero, nome, ativo)
+            VALUES (p_numero, p_nome, p_ativo); 
+        SELECT numero, nome
+            FROM banco
+            WHERE numero = p_numero; 
+    $$; 
+```
+
+
+
+<b>PLPGSQL</b>
+
+Permite transações.
+
+Exemplo:
+
+```sql
+CREATE OR REPLACE FUNCTION banCO_add(p_numero INTEGER, p_nome VARCHAR, p_ativo BOOLEAN)
+    RETURNS BOOLEAN
+    LANGUAGE PLPGSQL
+    AS $$
+    	DECLARE variavel_id INTEGER;
+    	BEGIN 
+            SELECT INTO variavel_id numero
+            	FROM banco
+            	WHERE nome = p_nome; 
+            IF variavel_id IS NULL THEN
+            	INSERT INTO banco (numero, nome, ativo)
+            		VALUES (p_numero, p_nome, p_otivo);
+            ELSE
+            	RETURN FALSE;
+            END IF;
+            
+            SELECT INTO variavel_id numero
+            	FROM banco
+            	WHERE nome = p_nome; 
+            
+            IF variavel_id IS NULL THEN
+            	RETURN FALSE;
+            ELSE
+            	RETURN TRUE;
+            END IF;
+        END;
+   	$$; 
+
+SELECT banco_add(13,'Banco azarado',true); 
+```
+
+
+
+Prática:
+
+```sql
+CREATE OR REPLACE FUNCTION func_somar(INTEGER, INTEGER)
+	RETURNS INTEGER
+	SECURITY DEFINER
+	RETURNS NULL ON NULL INPUT
+	LANGUAGE SQL
+	AS $$
+		SELECT $1 + $2;
+	$$;
+	
+SELECT func_somar(10,5);
+```
+
+![image-20210716172223295](https://i.loli.net/2021/07/17/8uehvJOP2AIbT9y.png)
+
+```sql
+CREATE OR REPLACE FUNCTION func_somar(INTEGER, INTEGER)
+	RETURNS INTEGER
+	SECURITY DEFINER
+	-- RETURNS NULL ON NULL INPUT
+	CALLED ON NULL INPUT
+	LANGUAGE SQL
+	AS $$
+		SELECT $1 + $2;
+	$$;
+	
+SELECT func_somar(NULL,5);
+```
+
+![image-20210716173401205](https://i.loli.net/2021/07/17/83wK6doYgbArINX.png)
+
+```sql
+SELECT COALESCE(null, 'daniel', 'digital'); -- Retorna o primeiro valor não nulo
+```
+
+![image-20210716173927963](https://i.loli.net/2021/07/17/SRnqldziUBvkx7w.png)
+
+
+
+```SQL
+CREATE OR REPLACE FUNCTION func_somar(INTEGER, INTEGER)
+	RETURNS INTEGER
+	SECURITY DEFINER
+	-- RETURNS NULL ON NULL INPUT
+	CALLED ON NULL INPUT
+	LANGUAGE SQL
+	AS $$
+		SELECT COALESCE($1, 0) + COALESCE($2,0);
+	$$;
+	
+SELECT func_somar(NULL,5);
+```
+
+![image-20210716175506008](https://i.loli.net/2021/07/17/5dqcoRQJM9guZwx.png)
+
+```SQL
+CREATE OR REPLACE FUNCTION bancos_add(p_numero INTEGER, p_nome VARCHAR, p_ativo BOOLEAN)
+	RETURNS INTEGER
+	SECURITY INVOKER
+	LANGUAGE PLPGSQL
+	CALLED ON NULL INPUT
+	AS $$
+		DECLARE variavel_id INTEGER;
+		BEGIN
+			SELECT INTO variavel_id numero
+			FROM banco
+			WHERE numero = p_numero;
+			
+			RETURN variavel_id;
+		END;
+	$$;
+	
+SELECT bancos_add(1, 'Banco Novo', false);
+```
+
+![image-20210716180001224](https://i.loli.net/2021/07/17/qg9N6opxwfJZRMK.png)
+
+O SELECT retorna 1, isso significa que existe um banco com número 1 na database.
+
+```sql
+SELECT bancos_add(5432, 'Banco Novo', false);
+```
+
+![image-20210716180108868](https://i.loli.net/2021/07/17/jlsghv983qEeo7P.png)
+
+```sql
+CREATE OR REPLACE FUNCTION bancos_add(p_numero INTEGER, p_nome VARCHAR, p_ativo BOOLEAN)
+	RETURNS INTEGER
+	SECURITY INVOKER
+	LANGUAGE PLPGSQL
+	CALLED ON NULL INPUT
+	AS $$
+		DECLARE variavel_id INTEGER;
+		BEGIN
+			IF p_nome IS NULL OR p_numero IS NULL OR p_ativo IS NULL THEN
+				RETURN 0;
+			END IF;
+			
+			SELECT INTO variavel_id numero
+			FROM banco
+			WHERE numero = p_numero;
+			
+			RETURN variavel_id;
+		END;
+	$$;
+	
+SELECT bancos_add(5432, 'Banco Novo', NULL);
+```
+
+![image-20210716180411357](https://i.loli.net/2021/07/17/zGrSdTxUqyFJ4No.png)
+
+```sql
+CREATE OR REPLACE FUNCTION bancos_add(p_numero INTEGER, p_nome VARCHAR, p_ativo BOOLEAN)
+	RETURNS INTEGER
+	SECURITY INVOKER
+	LANGUAGE PLPGSQL
+	CALLED ON NULL INPUT
+	AS $$
+		DECLARE variavel_id INTEGER;
+		BEGIN
+			IF p_nome IS NULL OR p_numero IS NULL OR p_ativo IS NULL THEN
+				RETURN 0;
+			END IF;
+			
+			SELECT INTO variavel_id numero
+				FROM banco
+				WHERE numero = p_numero;
+			
+			IF variavel_id IS NULL THEN
+				INSERT INTO banco(numero, nome, ativo)
+					VALUES(p_numero, p_nome, p_ativo);
+				RETURN p_numero;
+			ELSE
+				RETURN 9999999;
+			END IF;
+			
+			RETURN variavel_id;
+		END;
+	$$;
+	
+SELECT bancos_add(123456, 'Banco Denovo', false);
+```
+
+![image-20210716181150865](https://i.loli.net/2021/07/17/tToRbMn3wdZOXGl.png)
+
+```sql
+SELECT numero, nome, ativo
+	FROM banco
+	WHERE numero = 123456;
+```
+
+![image-20210716181235858](https://i.loli.net/2021/07/17/SyHviC2G9mo6al7.png)
+
