@@ -2382,7 +2382,191 @@ SELECT id, gerente, funcionario
 Desafio:
 
 ```sql
+CREATE OR REPLACE RECURSIVE VIEW vw_func(id_func, id_gerente, funcionario) AS (
+    SELECT id, gerente, nome
+        FROM funcionarios
+            WHERE gerente IS NULL
+    UNION ALL
+    SELECT funcionarios.id, funcionarios.gerente, funcionarios.nome
+        FROM funcionarios
+        JOIN vw_func
+            ON vw_func.id_func = funcionarios.gerente
+);
+
+CREATE OR REPLACE RECURSIVE VIEW vw_func_2(func_id, func_nome, gerente_id, gerente_nome) AS (
+    SELECT vw_func.id_func, vw_func.funcionario, vw_func.id_gerente, funcionarios.nome
+        FROM vw_func
+        LEFT JOIN funcionarios
+            ON funcionarios.id = vw_func.id_gerente
+);
+
+SELECT func_id, func_nome, gerente_id, gerente_nome
+    FROM vw_func_2;
 ```
 
 
+
+### Aula 2 - Transações
+
+
+
+#### 1) Transações
+
+É o conceito fundamental de todos os sistemas de bancos de dados, seja ele postgres, mysql, oracle. É a base de tudo o que pode pensar de banco de dados relacional. É um conceito de múltiplas etapas/códigos reunidos em apenas uma transação, onde o resultado precisa ser tudo ou nada.
+
+Exemplo:
+
+```sql
+UPDATE conta SET valor = valor - 100.00
+	WHERE nome = 'Alice';
+
+UPDATE conta SET valor = valor + 100.00
+	WHERE nome = 'Bob';
+```
+
+No exemplo, a Alice deposita um dinheiro na conta do Bob. Mas, se houver algum problema nas execuções, pode ser que o Bob nunca receba o valor na conta. Para resolver isso, temos as transações:
+
+```sql
+BEGIN; -- ou BEGIN TRANSACTION
+	UPDATE conta SET valor = valor - 100.00
+        WHERE nome = 'Alice';
+
+    UPDATE conta SET valor = valor + 100.00
+        WHERE nome = 'Bob';
+COMMIT;
+```
+
+Se acontecer qualquer erro, o resultado é um ROLLBACK, desfazendo as alterações no banco de dados.
+
+```sql
+BEGIN; -- ou BEGIN TRANSACTION
+	UPDATE conta SET valor = valor - 100.00
+        WHERE nome = 'Alice';
+        
+SAVEPOINT my_savepoint;
+
+    UPDATE conta SET valor = valor + 100.00
+        WHERE nome = 'Bob';
+        -- Dessa vez, o dinheiro era para o Wally e não para o Bob, assim, temos:
+        
+ROLLBACK TO my_savepoint;
+
+	UPDATE conta SET valor = valor + 100.00
+        WHERE nome = 'Wally';
+	
+COMMIT;
+```
+
+Com o SAVEPOINT, é possível retornar a ele, ignorando o erro e tornando possível executar o comando correto.
+
+Na prática, temos:
+
+```sql
+SELECT numero, nome, ativo
+	FROM banco
+	ORDER BY numero;
+```
+
+![image-20210716155631452](https://i.loli.net/2021/07/17/ES9B8C67uQMdejO.png)
+
+```sql
+UPDATE banco
+	SET ativo = false
+	WHERE numero = 0;
+
+BEGIN;
+	UPDATE banco
+		SET ativo = TRUE
+		WHERE numero = 0;
+	
+	SELECT numero, nome, ativo
+		FROM banco
+		WHERE numero = 0;
+```
+
+![image-20210716155436528](https://i.loli.net/2021/07/17/2vwJrsNfY1HyXlP.png)
+
+```sql
+UPDATE banco
+	SET ativo = false
+	WHERE numero = 0;
+
+BEGIN;
+	UPDATE banco
+		SET ativo = TRUE
+		WHERE numero = 0;
+	
+	SELECT numero, nome, ativo
+		FROM banco
+		WHERE numero = 0;
+		
+ROLLBACK;
+
+SELECT numero, nome, ativo
+		FROM banco
+		WHERE numero = 0;
+```
+
+![image-20210716155722145](https://i.loli.net/2021/07/17/zq8OkJZfCHeanuL.png)
+
+```sql
+BEGIN;
+	UPDATE banco
+		SET ativo = true
+		WHERE numero = 0;
+COMMIT;
+
+SELECT numero, nome, ativo
+		FROM banco
+		WHERE numero = 0;
+```
+
+![image-20210716155901452](https://i.loli.net/2021/07/17/dsNUuraT2woHRGv.png)
+
+```SQL
+BEGIN;
+	UPDATE funcionarios
+		SET gerente = 2
+		WHERE id = 3;
+	
+	SELECT id, gerente, nome
+		FROM funcionarios; -- 1)
+
+SAVEPOINT sf_func;
+	
+	UPDATE funcionarios
+		SET gerente = null;
+	
+	SELECT id, gerente, nome
+		FROM funcionarios; -- 2)
+
+ROLLBACK TO sf_func;
+
+	UPDATE funcionarios
+		SET gerente = 3
+		WHERE id = 5;
+	
+	SELECT id, gerente, nome
+		FROM funcionarios; -- 3)
+COMMIT;
+	
+SELECT id, gerente, nome
+	FROM funcionarios; -- 4)
+```
+
+<center>1)</center>
+
+![image-20210716160329758](https://i.loli.net/2021/07/17/qvRZUtxIPTLkb5M.png)
+
+<center>2)</center>
+
+![image-20210716160407841](https://i.loli.net/2021/07/17/dyVBGYKQOaMZez2.png)
+
+<center>3)</center>
+
+![image-20210716160433847](https://i.loli.net/2021/07/17/rITFkQthVnAP8C6.png)
+
+<center>4)</center>
+
+![image-20210716160447753](https://i.loli.net/2021/07/17/SRLYBePbIymC9QW.png)
 
