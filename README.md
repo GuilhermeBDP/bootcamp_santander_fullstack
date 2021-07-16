@@ -14,7 +14,7 @@
 
 :heavy_check_mark: ​Introdução ao Git e ao Github
 
-:x: ​Conceitos e melhores práticas com banco de dados PostgreSQL
+:heavy_check_mark: Conceitos e melhores práticas com banco de dados PostgreSQL
 
 :x: ​Desenvolvimento básico em Java
 
