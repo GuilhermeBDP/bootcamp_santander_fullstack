@@ -1793,3 +1793,596 @@ SELECT	banco.nome,
 
 ![image-20210714143505363](https://i.loli.net/2021/07/15/IpNCgxLoicuyv5D.png)
 
+
+
+
+
+### Aula 4 - CTE
+
+
+
+#### 1) Commom Table Expressions - CTE
+
+CTE é uma forma auxiliar de organizar statements (blocos de códigos) para consultas muito grande, gerando tabelas temporárias e criando relacionamentos entre elas. Dentre dos statements, podem ter SELECTs, INSERTs, UPDATEs ou DELETEs. É uma ferramenta para você agilizar e organizar seu código.
+
+
+
+<b>WITH statements</b>
+
+Sintaxe básica:
+
+```sql
+WITH nome1 AS (
+	SELECT campos
+    	FROM tabela_A
+    	[WHERE condicao]
+),
+	nome2 AS (
+    SELECT campos
+    	FROM tabela_B
+    	[WHERE condicao]
+)
+
+SELECT nome1.campos, nome2.campos
+	FROM nome1
+	JOIN nome2...
+```
+
+
+
+Exemplos:
+
+```sql
+WITH tbl_tmp_banco AS (
+	SELECT numero, nome
+	FROM banco
+)
+SELECT numero, nome
+FROM tbl_tmp_banco;
+```
+
+![image-20210714185430608](https://i.loli.net/2021/07/15/lQropAnH74ImJX8.png)
+
+```sql
+-- Método 1: CTE
+WITH params AS (
+	SELECT 213 AS banco_numero
+), tbl_tmp_banco AS (
+	SELECT numero, nome
+		FROM banco
+		JOIN params ON params.banco_numero = banco.numero
+)
+SELECT numero, nome
+	FROM tbl_tmp_banco;
+
+-- Método 2: SUBSELECT
+SELECT banco.numero, banco.nome
+FROM banco
+JOIN (
+	SELECT 213 AS banco_numero
+) params ON params.banco_numero = banco.numero;
+
+```
+
+![image-20210714190525087](https://i.loli.net/2021/07/15/KcUBrJY6IeZFWlx.png)
+
+
+
+```SQL
+WITH clientes_e_transacoes AS (
+	SELECT 	cliente.nome AS cliente_nome,
+			tipo_transacao.nome AS tipo_transacao_nome,
+			cliente_transacoes.valor AS tipo_transacao_valor
+	FROM cliente_transacoes
+	JOIN cliente
+		ON cliente.numero = cliente_transacoes.cliente_numero
+	JOIN tipo_transacao
+		ON tipo_transacao.id = cliente_transacoes.tipo_transacao_id
+)
+
+SELECT cliente_nome, tipo_transacao_nome, tipo_transacao_valor
+FROM clientes_e_transacoes;
+```
+
+![image-20210714194808175](https://i.loli.net/2021/07/15/zxs4uJX5ivcC3OV.png)
+
+```sql
+WITH clientes_e_transacoes AS (
+	SELECT 	cliente.nome AS cliente_nome,
+			tipo_transacao.nome AS tipo_transacao_nome,
+			cliente_transacoes.valor AS tipo_transacao_valor
+	FROM cliente_transacoes
+	JOIN cliente 
+		ON cliente.numero = cliente_transacoes.cliente_numero
+	JOIN tipo_transacao 
+		ON tipo_transacao.id = cliente_transacoes.tipo_transacao_id
+	JOIN banco 
+		ON banco.numero = cliente_transacoes.banco_numero 
+			AND banco.nome ILIKE '%Itaú%'
+)
+SELECT cliente_nome, tipo_transacao_nome, tipo_transacao_valor
+FROM clientes_e_transacoes;
+```
+
+![image-20210714195738893](https://i.loli.net/2021/07/15/FcHXG6CIvif5Yy8.png)
+
+
+
+## Módulo 4 - Comandos avançados da SQL
+
+
+
+### Aula 1 - Views
+
+
+
+#### 1) Views
+
+Views são visões, são camadas para as tabelas. São camadas que ficam à frente das tabelas, à frente das consultas SQL, sendo essas consultas robustas ou não. Aceitam comandos de SELECT, INSERT, UPDATE e DELETE. Somente as views que fazem referência a apenas uma tabela permitem o uso do INSERT, UPDATE e DELETE. Views que façam referência a mais de uma tabela aceitam apenas o SELECT.
+
+As views simplificam o acesso mais rápido às consultas, sendo uma boa prática de segurança, pois as pessoas que utilizarem as views irão consumir apenas as views e não terão acesso direto às tabelas.
+
+
+
+Sintaxe
+
+```sql
+CREATE [ OR REPLACE ] [ TEMP | TEMPORARY ] [ RECURSIVE ] VIEW name [ ( column_name [, ...] ) ]
+	[ WITH ( view_option_name [= view_option_value] [, ] ) ]
+	AS query [
+        WITH [ CASCADED | LOCAL ] CHECK OPTION ]
+```
+
+
+
+<b>Idempotência</b>
+
+```sql
+CREATE OR REPLACE VIEW vw_bancos AS (
+    SELECT numero, nome, ativo
+    	FROM banco
+); 
+SELECT numero, nome, ativo
+	FROM vw_bancos; 
+
+CREATE OR REPLACE VIEW vw_bancos (banco_numero, banco_nome, banco_ativo) AS (
+    SELECT numero, nome, ativo
+    	FROM banco
+); 
+SELECT banco_numero, banco_nome, banco_ativo
+	FROM vw_bancos; 
+```
+
+As views não possuem tipo de dado pois eles assumem o tipo de dado da consulta.
+
+
+
+<b>INSERT, UPDATE E DELETE</b>
+
+```SQL
+CREATE OR REPLACE VIEW vw_bancos AS (
+    SELECT numero, nome, ativo
+    	FROM banco
+);
+SELECT numero, nome, ativo
+	FROM vw_bancos;
+	
+INSERT INTO vw_bancos (numero, nome, ativo)
+	VALUES (100, 'Banco CEM', TRUE);
+
+UPDATE vw_bancos
+	SET nome = 'Banco 100'
+	WHERE numero = 100;
+
+DELETE FROM vw_bancos
+	WHERE numero = 100; 
+```
+
+
+
+<b>TEMPORARY</b>
+
+```sql
+CREATE OR REPLACE TEMPORARY VIEW vw_bancos AS (
+    SELECT numero, nome, ativo
+    FROM banco
+); 
+SELECT numero, nome, ativo
+	FROM vw_bancos; 
+```
+
+Essa view ficará presente apenas na sessão do usuário, ao desconectar-se, ela será perdida.
+
+
+
+<b>RECURSIVE</b>
+
+```sql
+CREATE OR REPLACE RECURSIVE VIEW (nome_da_view)(campos_da_view) AS (
+    SELECT base 
+    UNION ALL 
+    SELECT campos
+    	FROM tabela_base
+    JOIN (nome_da_view)
+);
+```
+
+* UNION - Agrupa, unifica dados iguais
+* UNION ALL - Não unifica
+
+No RECURSIVE, é obrigatória a existência dos campos da VIEW.
+
+Exemplo:
+
+Considerando a tabela criada abaixo:
+
+```sql
+CREATE TABLE IF NOT EXISTS funcionarios (
+    id SERIAL NOT NULL,
+    nome VARCHAR (50),
+    gerente INTEGER,
+    PRIMARY KEY (id),
+    FOREIGN KEY (gerente) REFERENCES funcionarios (id)
+);
+
+INSERT INTO funcionarios (nome, gerente)
+	VALUES ('Ancelmo', null);
+INSERT INTO funcionarios (nome, gerente)
+	VALUES ('Beatriz',1);
+INSERT INTO funcionarios (nome, gerente)
+	VALUES ('Magno',1);
+INSERT INTO funcionarios (nome, gerente)
+	VALUES ('Cremilda',2);
+INSERT INTO funcionarios (nome, gerente)
+	VALUES ('Wagner',4); 
+```
+
+Os INSERTs, então, ficam nesse formato:
+
+![image-20210714213002683](https://i.loli.net/2021/07/15/7EAqItRTGkPanM1.png)
+
+Ao executar o comando abaixo, temos:
+
+```SQL
+SELECT id, nome, gerente
+	FROM funcionarios
+	WHERE gerente IS NULL;
+```
+
+![image-20210714213134499](https://i.loli.net/2021/07/15/ZCXrLh5oanOwPsj.png)
+
+```SQL
+SELECT id, nome, gerente
+	FROM funcionarios
+	WHERE gerente = 999;
+```
+
+![image-20210714213232806](https://i.loli.net/2021/07/15/N2nl54VSAOrFpEv.png)
+
+Utilizando o comando UNION ALL:
+
+```SQL
+SELECT id, nome, gerente
+	FROM funcionarios
+        WHERE gerente IS NULL
+	UNION ALL
+SELECT id, nome, gerente
+	FROM funcionarios
+    	WHERE gerente = 999;
+```
+
+![image-20210714213426234](https://i.loli.net/2021/07/15/tR38mEZPSXKJjWy.png)
+
+
+
+Agora, criando uma VIEW mais complexa:
+
+```sql
+CREATE OR REPLACE RECURSIVE VIEW vw_funcionarios(id, gerente, funcionario) AS (
+    SELECT id, gerente, nome
+        FROM funcionarios
+            WHERE gerente IS NULL
+    UNION ALL
+    SELECT funcionarios.id, funcionarios.gerente, funcionarios.nome
+    	FROM funcionarios
+    	JOIN vw_funcionarios
+    		ON vw_funcionarios.id = funcionarios.gerente
+);
+SELECT id, gerente, funcionario
+	FROM vwfuncionarios;
+```
+
+Repare que na VIEW acima, o JOIN é feito em cima da própria VIEW. Logo, na primeira vez que a VIEW for executada, irá ser retornado id = 1, gerente = null e nome = ancelmo.  O gerente é NULL pois na primeira execução, a ação vw_funcionarios.id = funcionarios.gerente iguala o id do funcionário atual com o seu respectivo gerente para que, assim, seja possível resgatar o id do gerente do funcionário. Como o Ancelmo não possui gerente, o JOIN vw_funcionarios irá juntar um registro nulo.
+
+Na segunda execução, o JOIN irá juntar o Ancelmo com os funcionários que possuem ele como gerente, pois o JOIN irá juntar o registro que tiver o id = 1 (Ancelmo) como gerente.
+
+
+
+Realizando uma busca mais inteligente:
+
+```sql
+CREATE OR REPLACE RECURSIVE VIEW vw_funcionarios(id, gerente, funcionario) AS (
+    SELECT id, CAST(AS VARCHAR) AS gerente, nome
+    	FROM funcionarios
+    	WHERE gerente IS NULL
+    UNION ALL
+    SELECT funcionarios.id, gerentes.nome, funcionarios.nome
+    	FROM funcionarios
+    	JOIN vw_funcionarios
+    		ON vw_funcionarios.id = funcionarios.gerente
+    	JOIN funcionarios gerentes
+    		ON gerentes.id = vw_funcionarios.id 
+);
+
+SELECT id, gerente, funcionario FROM vw_funcionarios;
+```
+
+
+
+<b>WITH OPTIONS</b>
+
+```sql
+CREATE OR REPLACE VIEW vw_bancos AS (
+    SELECT numero, nome, ativo
+    FROM banco
+);
+INSERT INTO vw_bancos (numero, nome, ativo)
+	VALUES (100, 'Banco CEM', FALSE) -- OK 
+
+CREATE OR REPLACE VIEW vw_bancos AS (
+    SELECT numero, nome, ativo
+    	FROM banco
+    	WHERE ativo IS TRUE
+) WITH LOCAL CHECK OPTION; 
+
+INSERT INTO vw_bancos (numero, nome, ativo)
+	VALUES (100, 'Banco CEM', FALSE) -- ERRO 
+```
+
+```sql
+CREATE OR REPLACE VIEW vw_bancos_ativos AS (
+    SELECT numero, nome, ativo
+    	FROM banco
+    	WHERE ativo IS TRUE
+) WITH LOCAL CHECK OPTION;
+
+CREATE OR REPLACE VIEW vw_bancos_maiores_que_l00 AS (
+    SELECT numero, nome, ativo
+    	FROM vw_banco
+    	WHERE numero > 100
+) WITH LOCAL CHECK OPTION;
+
+INSERT INTO vw_bancos_maiores_que_100 (numero, name, ativo)
+	VALUES (99, 'Banco DIO', FALSE) -- ERRO
+	
+INSERT INTO vw_bancos_maiores_que_100 (numero, nome, alivo)
+	VALUES (200, 'Banco DIO', FALSE) -- ERRO 
+```
+
+Repare que no primeiro INSERT o erro foi devido a condição da VIEW vw_bancos_maiores_que_100. Já no segundo INSERT, o erro foi devido à VIEW vw_bancos_ativos.
+
+
+
+Testes no pgAdmin:
+
+```sql
+CREATE OR REPLACE VIEW vw_bancos AS (
+	SELECT numero, nome, ativo
+		FROM banco
+);
+
+SELECT numero, nome, ativo
+	FROM vw_bancos;
+```
+
+![image-20210715220218472](https://i.loli.net/2021/07/16/RCJLjIUQyNEh3kz.png)
+
+
+
+```sql
+CREATE OR REPLACE VIEW vw_bancos_2 (banco_numero, banco_nome, banco_ativo) AS (
+	SELECT numero, nome, ativo
+		FROM banco
+);
+
+SELECT banco_numero, banco_nome, banco_ativo
+	FROM vw_bancos_2;
+```
+
+![image-20210715220403634](https://i.loli.net/2021/07/16/2ENfJdbCjzLc8Sv.png)
+
+
+
+```sql
+INSERT INTO vw_bancos_2 (banco_numero, banco_nome, banco_ativo)
+	VALUES (51, 'Banco Boa Ideia', TRUE);
+
+SELECT banco_numero, banco_nome, banco_ativo
+    FROM vw_bancos_2
+    WHERE banco_numero = 51;
+```
+
+![image-20210715220915189](https://i.loli.net/2021/07/16/kK2pgDjFIz78Hmc.png)
+
+
+
+```SQL
+SELECT numero, nome, ativo
+    FROM banco
+    WHERE numero = 51;
+```
+
+![image-20210715221206202](https://i.loli.net/2021/07/16/ZA1UYxvdWQwJGM7.png)
+
+```SQL
+UPDATE vw_bancos_2
+	SET banco_ativo = FALSE
+	WHERE banco_numero = 51;
+
+SELECT banco_numero, banco_nome, banco_ativo
+    FROM vw_bancos_2
+    WHERE banco_numero = 51;
+```
+
+![image-20210715221555620](https://i.loli.net/2021/07/16/WVIUqbXk17QNwjS.png)
+
+
+
+```sql
+SELECT numero, nome, ativo
+	FROM banco
+	WHERE numero = 51;
+```
+
+![image-20210715222536070](https://i.loli.net/2021/07/16/vL89h5oUnJXGlZW.png)
+
+```sql
+DELETE FROM vw_bancos_2
+	WHERE banco_numero = 51;
+
+SELECT banco_numero, banco_nome, banco_ativo
+    FROM vw_bancos_2
+    WHERE banco_numero = 51;
+```
+
+![image-20210715222706646](https://i.loli.net/2021/07/16/VNHxoTeLvfKmFOJ.png)
+
+```sql
+SELECT numero, nome, ativo
+	FROM banco
+	WHERE numero = 51;
+```
+
+![image-20210715222722031](https://i.loli.net/2021/07/16/pP1NZk2stH3oAq7.png)
+
+
+
+```sql
+CREATE OR REPLACE TEMPORARY VIEW vw_agencia AS (
+	SELECT nome
+		FROM agencia
+);
+
+SELECT nome
+	FROM vw_agencia;
+```
+
+![image-20210715222847802](https://i.loli.net/2021/07/16/HrXFRBLWDyI4l85.png)
+
+Ao deslogar e logar no banco de dados novamente:
+
+```sql
+SELECT nome
+	FROM vw_agencia;
+```
+
+![image-20210715222931607](https://i.loli.net/2021/07/16/g2DBotjW7cSaKb8.png)
+
+```sql
+CREATE OR REPLACE VIEW vw_bancos_ativos AS (
+	SELECT numero, nome, ativo
+        FROM banco
+        WHERE ativo IS TRUE
+) WITH LOCAL CHECK OPTION;
+
+INSERT INTO vw_bancoS_ativos (numero, nome, ativo)
+	VALUES (51, 'Banco Boa Ideia', FALSE);
+```
+
+![image-20210715223308348](https://i.loli.net/2021/07/16/Uesk4otKDJETWfi.png)
+
+
+
+```sql
+CREATE OR REPLACE VIEW vw_bancos_com_a AS (
+	SELECT numero, nome, ativo
+	FROM vw_bancos_ativos
+	WHERE nome ILIKE 'a%'
+) WITH LOCAL CHECK OPTION;
+
+INSERT INTO vw_bancos_com_a (numero, nome, ativo)
+	VALUES (333, 'Beta Omega', TRUE);
+```
+
+![image-20210715223508961](https://i.loli.net/2021/07/16/LPAvDpzTl8fnVoX.png)
+
+
+
+```sql
+CREATE TABLE IF NOT EXISTS funcionarios (
+    id SERIAL NOT NULL,
+    nome VARCHAR (50),
+    gerente INTEGER,
+    PRIMARY KEY (id),
+    FOREIGN KEY (gerente) REFERENCES funcionarios (id)
+);
+
+INSERT INTO funcionarios (nome, gerente)
+	VALUES ('Ancelmo', null);
+INSERT INTO funcionarios (nome, gerente)
+	VALUES ('Beatriz',1);
+INSERT INTO funcionarios (nome, gerente)
+	VALUES ('Magno',1);
+INSERT INTO funcionarios (nome, gerente)
+	VALUES ('Cremilda',2);
+INSERT INTO funcionarios (nome, gerente)
+	VALUES ('Wagner',4); 
+
+SELECT id, nome, gerente
+	FROM funcionarios;
+```
+
+![image-20210715223923878](https://i.loli.net/2021/07/16/g6KEUdPSsrjDLbv.png)
+
+
+
+```sql
+SELECT id, nome, gerente
+	FROM funcionarios
+	WHERE gerente IS NULL;
+```
+
+![image-20210715224004195](https://i.loli.net/2021/07/16/Y4BHmyWdgiMxPNn.png)
+
+
+
+```sql
+SELECT id, nome, gerente
+	FROM funcionarios
+        WHERE gerente IS NULL
+	UNION ALL
+SELECT id, nome, gerente
+	FROM funcionarios
+    	WHERE gerente = 999;
+```
+
+![image-20210715224056943](https://i.loli.net/2021/07/16/XbyAtUROVh468au.png)
+
+
+
+```sql
+CREATE OR REPLACE RECURSIVE VIEW vw_func(id, gerente, funcionario) AS (
+    SELECT id, gerente, nome
+        FROM funcionarios
+            WHERE gerente IS NULL
+    UNION ALL
+    SELECT funcionarios.id, funcionarios.gerente, funcionarios.nome
+    	FROM funcionarios
+    	JOIN vw_func
+    		ON vw_func.id = funcionarios.gerente
+);
+SELECT id, gerente, funcionario
+	FROM vw_func;
+```
+
+![image-20210715224344083](https://i.loli.net/2021/07/16/aqFmwgAB71Q8Y9n.png)
+
+
+
+Desafio:
+
+```sql
+```
+
+
+
